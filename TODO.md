@@ -1,0 +1,3 @@
+- world info
+- generate grid
+- generate maze
