@@ -1,3 +1,4 @@
+- unit tests
 - world info
 - generate grid
 - generate maze

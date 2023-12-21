@@ -2,14 +2,8 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use bevy::window::WindowResolution;
 
-
-
-mod cursor;
-mod fps;
-
-use cursor::CursorPlugin;
-use fps::FpsPlugin;
-
+use rustilples::cursor::CursorPlugin;
+use rustilples::fps::FpsPlugin;
 
 fn main() {
     App::new()
@@ -35,26 +29,23 @@ pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Pr
     });
 }
 
-pub fn world_info(){
-    
-}
-
+pub fn world_info() {}
 
 // use bevy::sprite::MaterialMesh2dBundle;
 
 // pub const HERO_SPEED: f32 = 500.0;
 // pub const HERO_SIZE: f32 = 50.0;
 
-    //     .add_systems(Startup, spawn_camera)
-    //     .add_systems(Startup, spawn_castle)
-    //     .add_systems(Startup, spawn_hero)
-    //     .add_systems(Update, hero_movement)
-    //     .add_systems(Update, confine_hero_movement)
-    // // .add_startup_system(spawn_hero)
-    // .run();
-    //     .add_systems(Startup, setup)
-    //     .add_systems(Update, mouse_button_iter)
-    //     .run();
+//     .add_systems(Startup, spawn_camera)
+//     .add_systems(Startup, spawn_castle)
+//     .add_systems(Startup, spawn_hero)
+//     .add_systems(Update, hero_movement)
+//     .add_systems(Update, confine_hero_movement)
+// // .add_startup_system(spawn_hero)
+// .run();
+//     .add_systems(Startup, setup)
+//     .add_systems(Update, mouse_button_iter)
+//     .run();
 
 // #[derive(Component)]
 // pub struct Hero;
@@ -67,10 +58,6 @@ pub fn world_info(){
 
 // #[derive(Component)]
 // struct Name(String);
-
-
-
-
 
 // pub fn spawn_castle(
 //     mut commands: Commands,
@@ -108,7 +95,6 @@ pub fn world_info(){
 //         }
 //     ));
 
-
 //     let transform = Transform::from_xyz( window.width() - 200.0, window.height() / 3.0, 0.0)
 //                                          .with_scale(Vec3 { x: 0.4, y: 0.4, z: 0.4 });
 
@@ -124,7 +110,6 @@ pub fn world_info(){
 //         }
 //     ));
 // }
-
 
 // pub fn spawn_hero(
 //     mut commands: Commands,
@@ -143,7 +128,6 @@ pub fn world_info(){
 //     ));
 // }
 
-
 // pub fn hero_movement(
 //     keyboard_input: Res<Input<KeyCode>>,
 //     mut hero_query: Query<&mut Transform, With<Hero>>,
@@ -154,18 +138,8 @@ pub fn world_info(){
 //     if let Ok(mut hero_transform) = hero_query.get_single_mut() {
 
 //         // if let Ok((hero_entity, mut hero_transform)) = hero_query.get_single_mut() {
-            
-    
+
 //         // }
-
-
-
-
-
-
-
-
-
 
 //         let mut direction = Vec3::ZERO;
 
@@ -186,19 +160,17 @@ pub fn world_info(){
 //             direction = direction.normalize();
 //         }
 
-
-
 //         let result_direction = direction * HERO_SPEED * time.delta_seconds();
 //         let window = window_query.get_single().unwrap();
-    
+
 //             let half_hero_size = HERO_SIZE / 2.0; // 32.0
 //             let x_min = 0.0 + half_hero_size;
 //             let x_max = window.width() - half_hero_size;
 //             let y_min = 0.0 + half_hero_size;
 //             let y_max = window.height() - half_hero_size;
-    
+
 //             let mut translation = hero_transform.translation;
-    
+
 //             // Bound the hero x position
 //             if translation.x < x_min {
 //                 return
@@ -211,26 +183,24 @@ pub fn world_info(){
 //             } else if translation.y > y_max {
 //                 return
 //             }
-    
+
 //             let h_max_x = hero_transform.translation.x + half_hero_size + result_direction.x;
 //             let h_min_x = hero_transform.translation.x - half_hero_size - result_direction.x;
 //             let h_max_y = hero_transform.translation.y + half_hero_size - result_direction.y;
 //             let h_min_y = hero_transform.translation.y - half_hero_size + result_direction.y;
-    
+
 //             for (castle, castle_transform) in castles_query.iter() {
 //                     let c_max_x = castle_transform.translation.x + castle.width / 2.0;
 //                     let c_min_x = castle_transform.translation.x - castle.width / 2.0;
 //                     let c_max_y = castle_transform.translation.y + castle.height / 2.0;
 //                     let c_min_y = castle_transform.translation.y - castle.height / 2.0;
-    
-    
+
 //                     if h_min_y < c_max_y && h_max_y > c_min_y {
 //                         if h_max_x > c_min_x && h_min_x < c_max_x  {
 //                             return
 //                        }
 //                     }
 //             }
-
 
 //         hero_transform.translation += result_direction;
 //     }
@@ -276,7 +246,6 @@ pub fn world_info(){
 //     //             let c_max_y = castle_transform.translation.y + castle.height / 2.0;
 //     //             let c_min_y = castle_transform.translation.y - castle.height / 2.0;
 
-
 //     //             if h_min_y < c_max_y && h_max_y > c_min_y {
 //     //                 if h_max_x > c_min_x && h_min_x < c_max_x  {
 //     //                     return
@@ -299,12 +268,6 @@ pub fn world_info(){
 // //     }
 // // }
 
-
-
-
-
-
-
 // // fn mouse_button_iter(
 // //     buttons: Res<Input<MouseButton>>,
 // // ) {
@@ -319,8 +282,6 @@ pub fn world_info(){
 // //     }
 // // }
 
-
-
 // // fn cursor_position(
 // //     q_windows: Query<&Window, With<PrimaryWindow>>,
 // // ) {
@@ -331,10 +292,6 @@ pub fn world_info(){
 // //         println!("Cursor is not in the game window.");
 // //     }
 // // }
-
-
-
-
 
 // // fn setup(
 // //     mut commands: Commands,
@@ -381,25 +338,6 @@ pub fn world_info(){
 // //     });
 // // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // // pub struct HelloPlugin;
 
 // // impl Plugin for HelloPlugin {
@@ -407,7 +345,6 @@ pub fn world_info(){
 // //         println!("hello world!");
 // //     }
 // // }
-
 
 // // pub struct CastlesPlugin;
 
@@ -417,5 +354,3 @@ pub fn world_info(){
 // //            .add_systems(Update, render_castles);
 // //     }
 // // }
-
-

@@ -3,10 +3,7 @@ use bevy::window::PrimaryWindow;
 
 use super::Cursor;
 
-pub fn spawn_cursor(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-) {
+pub fn spawn_cursor(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         SpriteBundle {
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
@@ -23,10 +20,15 @@ pub fn move_cursor(
     camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
 ) {
     if let Ok(mut transform) = cursor_query.get_single_mut() {
+        if windows.is_empty() {
+            return;
+        };
+
         let window = windows.single();
         let (camera, camera_transform) = camera.single();
 
-        if let Some(world_position) = window.cursor_position()
+        if let Some(world_position) = window
+            .cursor_position()
             .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
             .map(|ray| ray.origin.truncate())
         {
