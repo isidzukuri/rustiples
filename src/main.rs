@@ -4,6 +4,7 @@ use bevy::window::WindowResolution;
 
 use rustilples::cursor::CursorPlugin;
 use rustilples::fps::FpsPlugin;
+use rustilples::world_info::WorldInfoPlugin;
 
 fn main() {
     App::new()
@@ -15,6 +16,7 @@ fn main() {
             ..default()
         }))
         .add_plugins(FpsPlugin)
+        .add_plugins(WorldInfoPlugin)
         .add_systems(Startup, spawn_camera)
         .add_plugins(CursorPlugin)
         .run();
