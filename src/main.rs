@@ -37,7 +37,7 @@ pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Pr
 use rand::Rng;
 
 #[derive(Debug, PartialEq)]
-pub enum GameGraphNodeType {
+pub enum GraphNodeType {
     Standard,
     Blocked,
     RouteHead,
@@ -45,12 +45,11 @@ pub enum GameGraphNodeType {
 }
 
 #[derive(Component, Debug)]
-pub struct GameGraphNode {
+pub struct GraphNode {
     pub row: u32,
     pub col: u32,
-    pub node_type: GameGraphNodeType,
+    pub node_type: GraphNodeType,
 }
-
 
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
@@ -92,13 +91,13 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
                 transform: Transform::from_translation(Vec3::new(x, y, -1.)),
                 ..default()
             },
-            GameGraphNode {
+            GraphNode {
                 row: row_index,
                 col: col_index,
                 node_type: if random_num == 1 {
-                    GameGraphNodeType::Blocked
+                    GraphNodeType::Blocked
                 } else {
-                    GameGraphNodeType::Standard
+                    GraphNodeType::Standard
                 },
             },
         ));
@@ -115,7 +114,7 @@ pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
-    mut game_grid_nodes: Query<(&mut Sprite, &mut GameGraphNode), With<GameGraphNode>>,
+    mut game_grid_nodes: Query<(&mut Sprite, &mut GraphNode), With<GraphNode>>,
 ) {
     let window = windows.single();
 
@@ -143,12 +142,12 @@ pub fn grid_click(
                 .iter_mut()
                 .find(|(_, ref node)| node.row == row_index && node.col == col_index)
             {
-                if node.node_type != GameGraphNodeType::Standard {
+                if node.node_type != GraphNodeType::Standard {
                     return;
                 }
                 println!("{:?}", sprite);
                 sprite.color = Color::GREEN;
-                node.node_type = GameGraphNodeType::RouteHead;
+                node.node_type = GraphNodeType::RouteHead;
                 println!("{:?}", node);
 
             };
