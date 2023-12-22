@@ -8,10 +8,8 @@ pub fn print_window_size(mut commands: Commands, windows: Query<&Window>) {
     print_world_info(commands, format!("{}x{}", window.width(), window.height()));
 }
 
-pub fn print_world_info(mut commands: Commands, text: String){
-    commands.spawn(WorldInfoItem {
-        val: text
-    });
+pub fn print_world_info(mut commands: Commands, text: String) {
+    commands.spawn(WorldInfoItem { val: text });
 }
 
 pub fn setup_world_info(mut commands: Commands) {

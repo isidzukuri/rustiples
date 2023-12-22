@@ -4,8 +4,8 @@ use bevy::window::WindowResolution;
 
 use rustilples::cursor::CursorPlugin;
 use rustilples::fps::FpsPlugin;
-use rustilples::world_info::WorldInfoPlugin;
 pub use rustilples::world_info::print_world_info;
+use rustilples::world_info::WorldInfoPlugin;
 
 fn main() {
     App::new()
@@ -21,6 +21,7 @@ fn main() {
         .add_systems(Startup, spawn_camera)
         .add_plugins(CursorPlugin)
         .add_systems(Startup, generate_grid)
+        .add_systems(Update, grid_click)
         .run();
 }
 
@@ -33,11 +34,26 @@ pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Pr
     });
 }
 
-
-
 use rand::Rng;
 
-pub const GRID_CELL_WIDTH : f32 = 50.0 as f32;
+#[derive(Debug, PartialEq)]
+pub enum GameGraphNodeType {
+    Standard,
+    Blocked,
+    RouteHead,
+    RoutePoint,
+}
+
+#[derive(Component, Debug)]
+pub struct GameGraphNode {
+    pub row: u32,
+    pub col: u32,
+    pub node_type: GameGraphNodeType,
+}
+
+
+pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
+pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
 
 pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.get_single().unwrap();
@@ -48,30 +64,95 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
     let mut col_index = 0u32;
     let mut row_index = 0u32;
     loop {
-        println!("{}, {}", col_index, row_index);
-        if (row_index == height_in_cells && col_index == width_in_cells) { break; }
+        // println!("{}, {}", col_index, row_index);
+        if row_index == height_in_cells && col_index == 0 {
+            break;
+        }
 
-        let x = GRID_CELL_WIDTH * col_index as f32;       
-        let y = GRID_CELL_WIDTH * row_index as f32;
+        let x = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * col_index as f32;
+        let y = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * row_index as f32;
 
-        let r = rand::thread_rng().gen_range(0.0..0.5);
-        let g = rand::thread_rng().gen_range(0.4..0.5);
-        let b = rand::thread_rng().gen_range(0.0..0.5);
-        commands.spawn(SpriteBundle {
-            sprite: Sprite {
-                color: Color::rgb(r, g, b),
-                custom_size: Some(Vec2::new(GRID_CELL_WIDTH, GRID_CELL_WIDTH)),
+        // let r = rand::thread_rng().gen_range(0.0..0.2);
+        // let g = rand::thread_rng().gen_range(0.4..0.5);
+        // let b = rand::thread_rng().gen_range(0.0..0.2);
+        // let color = Color::rgb(r, g, b);
+        let random_num: u16 = rand::thread_rng().gen_range(1..5);
+
+        commands.spawn((
+            SpriteBundle {
+                sprite: Sprite {
+                    color: if random_num == 1 {
+                        Color::ORANGE
+                    } else {
+                        Color::GRAY
+                    },
+                    custom_size: Some(Vec2::new(GRID_CELL_WIDTH, GRID_CELL_WIDTH)),
+                    ..default()
+                },
+                transform: Transform::from_translation(Vec3::new(x, y, -1.)),
                 ..default()
             },
-            transform: Transform::from_translation(Vec3::new(x, y, -1.)),
-            ..default()
-        });
-    
+            GameGraphNode {
+                row: row_index,
+                col: col_index,
+                node_type: if random_num == 1 {
+                    GameGraphNodeType::Blocked
+                } else {
+                    GameGraphNodeType::Standard
+                },
+            },
+        ));
+
         col_index += 1;
-        if col_index > width_in_cells { 
+        if col_index == width_in_cells {
             col_index = 0;
             row_index += 1;
         };
+    }
+}
+
+pub fn grid_click(
+    mouse: Res<Input<MouseButton>>,
+    windows: Query<&Window, With<PrimaryWindow>>,
+    camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
+    mut game_grid_nodes: Query<(&mut Sprite, &mut GameGraphNode), With<GameGraphNode>>,
+) {
+    let window = windows.single();
+
+    if mouse.just_pressed(MouseButton::Left) {
+        let (camera, camera_transform) = camera.single();
+
+        if let Some(position) = window
+            .cursor_position()
+            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+            .map(|ray| ray.origin.truncate())
+        {
+            println!("{:?}", position);
+
+            let col_index = ((position.x) / GRID_CELL_WIDTH).floor() as u32;
+            let row_index = ((position.y) / GRID_CELL_WIDTH).floor() as u32;
+            println!("{}, {}", row_index, col_index);
+
+            // println!("{:?}", game_grid_nodes);
+
+            // for n in game_grid_nodes.iter() {
+            //     println!("{:?}", n);
+            // }
+
+            if let Some((mut sprite, mut node)) = game_grid_nodes
+                .iter_mut()
+                .find(|(_, ref node)| node.row == row_index && node.col == col_index)
+            {
+                if node.node_type != GameGraphNodeType::Standard {
+                    return;
+                }
+                println!("{:?}", sprite);
+                sprite.color = Color::GREEN;
+                node.node_type = GameGraphNodeType::RouteHead;
+                println!("{:?}", node);
+
+            };
+        }
     }
 }
 

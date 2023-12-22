@@ -4,8 +4,8 @@ mod components;
 mod systems;
 
 pub use components::*;
-use systems::*;
 pub use systems::print_world_info;
+use systems::*;
 
 pub struct WorldInfoPlugin;
 
