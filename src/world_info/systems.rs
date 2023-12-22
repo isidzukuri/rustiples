@@ -5,8 +5,12 @@ use super::{WorldInfoItem, WorldInfoRoot, WorldInfoText};
 pub fn print_window_size(mut commands: Commands, windows: Query<&Window>) {
     let window = windows.single();
 
+    print_world_info(commands, format!("{}x{}", window.width(), window.height()));
+}
+
+pub fn print_world_info(mut commands: Commands, text: String){
     commands.spawn(WorldInfoItem {
-        val: format!("{}x{}", window.width(), window.height()),
+        val: text
     });
 }
 

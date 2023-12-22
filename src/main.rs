@@ -5,6 +5,7 @@ use bevy::window::WindowResolution;
 use rustilples::cursor::CursorPlugin;
 use rustilples::fps::FpsPlugin;
 use rustilples::world_info::WorldInfoPlugin;
+pub use rustilples::world_info::print_world_info;
 
 fn main() {
     App::new()
@@ -19,6 +20,7 @@ fn main() {
         .add_plugins(WorldInfoPlugin)
         .add_systems(Startup, spawn_camera)
         .add_plugins(CursorPlugin)
+        .add_systems(Startup, generate_grid)
         .run();
 }
 
@@ -31,7 +33,47 @@ pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<Pr
     });
 }
 
-pub fn world_info() {}
+
+
+use rand::Rng;
+
+pub const GRID_CELL_WIDTH : f32 = 50.0 as f32;
+
+pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
+    let window = window_query.get_single().unwrap();
+
+    let width_in_cells = (window.width() / GRID_CELL_WIDTH) as u32;
+    let height_in_cells = (window.height() / GRID_CELL_WIDTH) as u32;
+
+    let mut col_index = 0u32;
+    let mut row_index = 0u32;
+    loop {
+        println!("{}, {}", col_index, row_index);
+        if (row_index == height_in_cells && col_index == width_in_cells) { break; }
+
+        let x = GRID_CELL_WIDTH * col_index as f32;       
+        let y = GRID_CELL_WIDTH * row_index as f32;
+
+        let r = rand::thread_rng().gen_range(0.0..0.5);
+        let g = rand::thread_rng().gen_range(0.4..0.5);
+        let b = rand::thread_rng().gen_range(0.0..0.5);
+        commands.spawn(SpriteBundle {
+            sprite: Sprite {
+                color: Color::rgb(r, g, b),
+                custom_size: Some(Vec2::new(GRID_CELL_WIDTH, GRID_CELL_WIDTH)),
+                ..default()
+            },
+            transform: Transform::from_translation(Vec3::new(x, y, -1.)),
+            ..default()
+        });
+    
+        col_index += 1;
+        if col_index > width_in_cells { 
+            col_index = 0;
+            row_index += 1;
+        };
+    }
+}
 
 // use bevy::sprite::MaterialMesh2dBundle;
 
@@ -68,7 +110,7 @@ pub fn world_info() {}
 // ) {
 //     let window = window_query.get_single().unwrap();
 //     let transform = Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0)
-//                                          .with_scale(Vec3 { x: 0.4, y: 0.4, z: 0.4 });
+//                                          .with_scale(Vec3 { x: 100, y200 0.4, z: 0.4 });
 
 //     commands.spawn((
 //         SpriteBundle {

@@ -5,6 +5,7 @@ mod systems;
 
 pub use components::*;
 use systems::*;
+pub use systems::print_world_info;
 
 pub struct WorldInfoPlugin;
 
