@@ -11,7 +11,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: WindowResolution::new(1000., 800.).with_scale_factor_override(1.0),
+                resolution: WindowResolution::new(300., 200.).with_scale_factor_override(1.0),
                 ..default()
             }),
             ..default()
@@ -75,7 +75,7 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
         // let g = rand::thread_rng().gen_range(0.4..0.5);
         // let b = rand::thread_rng().gen_range(0.0..0.2);
         // let color = Color::rgb(r, g, b);
-        let random_num: u16 = rand::thread_rng().gen_range(1..5);
+        let random_num: u16 = rand::thread_rng().gen_range(1..50000);
 
         commands.spawn((
             SpriteBundle {
@@ -149,11 +149,385 @@ pub fn grid_click(
                 sprite.color = Color::GREEN;
                 node.node_type = GraphNodeType::RouteHead;
                 println!("{:?}", node);
-
             };
+
+            // let Some((mut sprite, mut node)) =
+            // let mut heads_count = 0;
+            // for (_, node) in game_grid_nodes.iter() {
+            //     if node.node_type == GraphNodeType::RouteHead { heads_count += 1; }
+            // }
+
+            // let mut heads_count = 0;
+            let mut route_heads = vec![];
+            for (_, node) in game_grid_nodes.iter() {
+                if node.node_type == GraphNodeType::RouteHead {
+                    route_heads.push((node.col, node.row));
+                    // heads_count += 1;
+                }
+            }
+
+            if route_heads.len() > 1 {
+                find_route(
+                    route_heads[0],
+                    route_heads[1],
+                    &game_grid_nodes.iter().map(|(_, node)| node).collect(),
+                );
+            }
         }
     }
 }
+
+// use bevy::ecs::query::QueryIter;
+
+pub fn find_route(start: (u32, u32), end: (u32, u32), game_grid_nodes: &Vec<&GraphNode>) {
+    // let mut routes : Vec<(f32, Vec<GraphNode>)> = vec![];
+
+    // let nodes: Vec<&GraphNode> = game_grid_nodes.map(|(_, node)| node).collect();
+
+    // println!("{:?}", game_grid_nodes);
+
+    let mut r = traverse(&start, &end, vec![], game_grid_nodes, &mut vec![]);
+    // println!("{:?}", r);
+
+    // r.dedup();
+
+    for i in r.iter() {
+        println!("{:?}", i);
+    }
+    println!("len: {:?}", r.len());
+}
+
+
+
+// (col, row)
+pub fn traverse(
+    start: &(u32, u32),
+    end: &(u32, u32),
+    mut trace: Vec<(u32, u32)>,
+    game_grid_nodes: &Vec<&GraphNode>,
+    mut cache: &mut Vec<(((u32, u32), (u32, u32)), Vec<(u32, u32)>)>,
+) -> Vec<Vec<(u32, u32)>> {
+
+    let mut traces: Vec<Vec<(u32, u32)>> = vec![];
+        // println!("{}", traces.len());
+
+
+    if trace.contains(start) {
+        // println!("{}", 99999);
+        return vec![];
+    } else {
+        trace.push(*start); 
+    };
+
+    if let Some(shortest) = traces
+            .iter()
+            .min_by(|a, b| a.len().cmp(&b.len()))
+        {
+            print!("{}", 888888888);
+
+
+        if shortest.len() <= trace.len() {
+            return vec![];
+        }
+    }
+
+
+    let mut connections: Vec<(u32, u32)> = vec![];
+
+    connections.push((start.0 + 1, start.1));
+    if start.0 > 0 {
+        connections.push((start.0 - 1, start.1))
+    };
+    connections.push((start.0, start.1 + 1));
+    if start.1 > 0 {
+        connections.push((start.0, start.1 - 1))
+    };
+
+
+    // println!("{:?}", connections);
+    for connection in connections.iter() {
+        if trace.contains(connection) {
+            // println!("{}", 99999);
+            continue;
+        };
+
+
+        let available_node = game_grid_nodes.iter().find(|node| {
+            (node.col == connection.0 && node.row == connection.1)
+                && (node.node_type == GraphNodeType::Standard
+                    || node.node_type == GraphNodeType::RouteHead)
+        });
+        if available_node.is_none() {
+            // println!("{}", 111111111);
+            continue;
+        };
+
+
+
+        // let Some((key, cached)) = cache
+        //     .iter()
+        //     .find(|(address, item)| address == (trace[0], connection)) {
+        //         if cached.len() <= trace.len() { 
+        //             return vec![]; 
+        //         } else {
+        //             cache.push(((trace[0], *connection), trace.clone()));
+        //         }
+        //     }
+
+
+        if let Some((key, cached)) = cache.iter().find(|(address, _)| *address == (trace[0], *connection)) {
+            if cached.len() <= trace.len() { 
+                return vec![]; 
+            } else {
+                
+            }
+        }
+
+        cache.push(((trace[0], *connection), trace.clone()));
+
+
+        // if let Some(shortest) = traces
+        //         .iter()
+        //         .min_by(|a, b| a.len().cmp(&b.len()))
+        //     {
+        //         print!("{}", 888888888);
+
+
+        //     if shortest.len() <= trace.len() {
+        //         return vec![];
+        //     }
+        // }
+
+
+
+        if connection == end {
+            trace.push(*connection);
+
+
+                    // &Vec<(((u32, u32), (u32, u32)), Vec<(u32, u32)>)>,
+
+            // if let Some(shortest) = traces
+            //         .iter()
+            //         .min_by(|a, b| a.len().cmp(&b.len()))
+            //     {
+
+
+            //     if shortest.len() > trace.len() {
+            //         traces.push(trace.clone());
+            //     }
+            // } else {
+                traces.push(trace.clone());
+            // }
+
+        } else {
+            let mut trace_copy = trace.clone();
+            // trace_copy.push(*connection);
+
+
+            let mut sub_traces = traverse(&connection, &end, trace_copy, game_grid_nodes, cache);
+            // let mut sub_traces = vec![];
+            // if let Some(shortest_sub) = sub_traces
+            //     .iter()
+            //     // .map(|item| item.len())
+            //     .min_by(|a, b| a.len().cmp(&b.len()))
+            // {
+
+
+            //     if let Some(shortest) = traces
+            //         .iter()
+            //         // .map(|item| item.len())
+            //         .min_by(|a, b| a.len().cmp(&b.len()))
+            //     {
+
+
+            //     if shortest > shortest_sub {
+            //         traces.push(shortest_sub.clone());
+            // // println!("{} > {}", new_trace.len(), shortest);
+            //         // continue;
+            //     }
+            // }
+            // }
+
+
+            // println!("{:?}", sub_traces.len());
+
+            // let mut path_results = traverse(&connection, end, new_trace, &game_grid_nodes);
+            
+            // for sub_trace in sub_traces.iter() {
+            //     // println!("{:?}", i);
+            //     if !traces.contains(sub_trace) {
+            //         traces.push(sub_trace.clone());
+            //     }
+            // }
+            traces.append(&mut sub_traces);
+        }
+
+    }
+
+    traces
+}
+
+// // (col, row)
+// pub fn traverse(
+//     start: &(u32, u32),
+//     end: &(u32, u32),
+//     mut trace: Vec<(u32, u32)>,
+//     game_grid_nodes: &Vec<&GraphNode>,
+// ) -> Vec<Vec<(u32, u32)>> {
+//     let mut traces: Vec<Vec<(u32, u32)>> = vec![];
+//     let mut connections: Vec<(u32, u32)> = vec![];
+
+//     connections.push((start.0 + 1, start.1));
+//     if start.0 > 0 {
+//         connections.push((start.0 - 1, start.1))
+//     };
+//     connections.push((start.0, start.1 + 1));
+//     if start.1 > 0 {
+//         connections.push((start.0, start.1 - 1))
+//     };
+//     // println!("{:?}", start);
+
+//     for connection in connections.iter() {
+//         if trace.contains(connection) {
+//             continue;
+//         };
+
+//         let available_node = game_grid_nodes.iter().find(|node| {
+//             (node.col == connection.0 && node.row == connection.1)
+//                 && (node.node_type == GraphNodeType::Standard
+//                     || node.node_type == GraphNodeType::RouteHead)
+//         });
+//         if available_node.is_none() {
+//             println!("{}", 111111111);
+//             continue;
+//         };
+
+//         // if (connection == end) {
+//         if (connection == end) {
+//             // if (connection.0 == end.0 && connection.1 == end.1) {
+//             trace.push(*start);
+//             trace.push(*connection);
+//             traces.push(trace.clone());
+//             println!("{}", 222222222);
+//         } else if end == start {
+//             println!("{}", 444444);
+//             continue;
+//         }else {
+//             println!("{}", 333333333);
+
+//             let mut new_trace = trace.clone();
+//             // new_trace.push(*start);
+//             new_trace.push(*connection);
+
+//             // (|x, y| x.cmp(y)).unwrap(), 5);
+//             if let Some(shortest) = traces
+//                 .iter()
+//                 .map(|item| item.len())
+//                 .min_by(|a, b| a.cmp(b))
+//             {
+
+
+//                 if new_trace.len() > shortest {
+//                     // println!("{} > {}", new_trace.len(), shortest);
+//                     continue;
+//                 }
+//             }
+
+//             let mut path_results = traverse(&connection, end, new_trace, &game_grid_nodes);
+
+//             traces.append(&mut path_results);
+//         }
+//     }
+//     traces
+// }
+
+// #[derive(Component, Debug)]
+// pub struct Graph {
+//     pub store: Vec<Connection>,
+// }
+
+// #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
+// pub struct Connection {
+//     pub cost: f32,
+//     pub a_node: GraphNode,
+//     pub b_node: GraphNode,
+// }
+
+// #[derive(Component, Debug, Clone)]
+// pub struct Path {
+//     pub connections: Vec<Connection>,
+// }
+
+// impl Path {
+//     pub fn cost(&self) -> f32 {
+//         let mut sum = 0.0;
+//         for connection in &self.connections {
+//             sum += connection.cost;
+//         }
+//         sum
+//     }
+// }
+
+// // #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
+// // pub struct Node {
+// //     pub id: u32,
+// // }
+
+// // Directional, weighted graph
+// impl Graph {
+//     pub fn get_connections(&self, from_node: &GraphNode) -> Vec<&Connection> {
+//         let mut result = Vec::new();
+
+//         for connection in self.store.iter().filter(|item| &item.a_node == from_node) {
+//             result.push(connection);
+//         }
+
+//         result
+//     }
+// }
+
+// pub fn dijkstra_search(
+//     graph: &Graph,
+//     start: &GraphNode,
+//     end: &GraphNode,
+//     trace: Vec<Connection>,
+// ) -> Option<Path> {
+//     let pathes = traverse(graph, &start, end, trace);
+//     if pathes.len() > 0 {
+//         let cheapest = pathes
+//             .iter()
+//             .min_by(|a, b| a.cost().partial_cmp(&b.cost()).unwrap())
+//             .unwrap();
+
+//         Some(cheapest.clone())
+//     } else {
+//         None
+//     }
+// }
+
+// pub fn traverse(graph: &Graph, start: &GraphNode, end: &GraphNode, mut trace: Vec<Connection>) -> Vec<Path> {
+//     let mut traces = Vec::new();
+//     let connections = graph.get_connections(&start);
+
+//     for connection in connections.iter() {
+//         if (connection.b_node == *end) || connection.a_node == *end {
+//             trace.push(**connection);
+
+//             traces.push(Path {
+//                 connections: trace.clone(),
+//             });
+//         } else {
+//             let mut new_trace = trace.clone();
+//             new_trace.push(**connection);
+
+//             let mut path_results = traverse(graph, &connection.b_node, end, new_trace);
+
+//             traces.append(&mut path_results);
+//         }
+//     }
+
+//     traces
+// }
 
 // use bevy::sprite::MaterialMesh2dBundle;
 
