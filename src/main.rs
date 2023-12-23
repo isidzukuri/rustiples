@@ -11,7 +11,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: WindowResolution::new(300., 200.).with_scale_factor_override(1.0),
+                resolution: WindowResolution::new(1000., 200.).with_scale_factor_override(1.0),
                 ..default()
             }),
             ..default()
@@ -186,15 +186,18 @@ pub fn find_route(start: (u32, u32), end: (u32, u32), game_grid_nodes: &Vec<&Gra
 
     // println!("{:?}", game_grid_nodes);
 
-    let mut r = traverse(&start, &end, vec![], game_grid_nodes, &mut vec![]);
+    // let mut traces = 
+    let mut traces: Vec<Vec<(u32, u32)>> = vec![];
+
+    traverse(&start, &end, vec![], game_grid_nodes, &mut vec![], &mut traces);
     // println!("{:?}", r);
 
     // r.dedup();
 
-    for i in r.iter() {
+    for i in traces.iter() {
         println!("{:?}", i);
     }
-    println!("len: {:?}", r.len());
+    println!("len: {:?}", traces.len());
 }
 
 
@@ -206,29 +209,35 @@ pub fn traverse(
     mut trace: Vec<(u32, u32)>,
     game_grid_nodes: &Vec<&GraphNode>,
     mut cache: &mut Vec<(((u32, u32), (u32, u32)), Vec<(u32, u32)>)>,
-) -> Vec<Vec<(u32, u32)>> {
-
-    let mut traces: Vec<Vec<(u32, u32)>> = vec![];
-        // println!("{}", traces.len());
-
-
+    mut traces: &mut Vec<Vec<(u32, u32)>>,
+)  {
     if trace.contains(start) {
-        // println!("{}", 99999);
-        return vec![];
+        cache.push(((trace[0], *start), vec![]));
+        return;
     } else {
         trace.push(*start); 
     };
+    let trace_len = trace.len();
+    let max_len = game_grid_nodes.len() /3;
+    if trace_len > max_len {
+        cache.push(((trace[0], *start), vec![]));
+        
+         return; 
+    }
 
-    if let Some(shortest) = traces
-            .iter()
-            .min_by(|a, b| a.len().cmp(&b.len()))
-        {
-            print!("{}", 888888888);
 
+    
+    let shortest_len = match  traces
+    .iter()
+    .min_by(|a, b| a.len().cmp(&b.len())) {
+        None => usize::MAX,
+        Some(shortest) => shortest.len()
+    };
 
-        if shortest.len() <= trace.len() {
-            return vec![];
-        }
+    if shortest_len <= trace_len {
+        cache.push(((trace[0], *start), vec![]));
+        
+        return;
     }
 
 
@@ -248,6 +257,8 @@ pub fn traverse(
     for connection in connections.iter() {
         if trace.contains(connection) {
             // println!("{}", 99999);
+            cache.push(((trace[0], *connection), vec![]));
+
             continue;
         };
 
@@ -259,112 +270,36 @@ pub fn traverse(
         });
         if available_node.is_none() {
             // println!("{}", 111111111);
+            cache.push(((trace[0], *connection), vec![]));
+
             continue;
         };
 
 
-
-        // let Some((key, cached)) = cache
-        //     .iter()
-        //     .find(|(address, item)| address == (trace[0], connection)) {
-        //         if cached.len() <= trace.len() { 
-        //             return vec![]; 
-        //         } else {
-        //             cache.push(((trace[0], *connection), trace.clone()));
-        //         }
-        //     }
-
-
         if let Some((key, cached)) = cache.iter().find(|(address, _)| *address == (trace[0], *connection)) {
-            if cached.len() <= trace.len() { 
-                return vec![]; 
+            if cached.len() <= trace_len { 
+                return; 
             } else {
-                
+                cache.push(((trace[0], *connection), trace.clone())); 
             }
+        } else {
+            cache.push(((trace[0], *connection), trace.clone()));
         }
-
-        cache.push(((trace[0], *connection), trace.clone()));
-
-
-        // if let Some(shortest) = traces
-        //         .iter()
-        //         .min_by(|a, b| a.len().cmp(&b.len()))
-        //     {
-        //         print!("{}", 888888888);
-
-
-        //     if shortest.len() <= trace.len() {
-        //         return vec![];
-        //     }
-        // }
-
 
 
         if connection == end {
             trace.push(*connection);
 
-
-                    // &Vec<(((u32, u32), (u32, u32)), Vec<(u32, u32)>)>,
-
-            // if let Some(shortest) = traces
-            //         .iter()
-            //         .min_by(|a, b| a.len().cmp(&b.len()))
-            //     {
-
-
-            //     if shortest.len() > trace.len() {
-            //         traces.push(trace.clone());
-            //     }
-            // } else {
+            if shortest_len > trace.len() {
                 traces.push(trace.clone());
-            // }
-
+            }
         } else {
             let mut trace_copy = trace.clone();
-            // trace_copy.push(*connection);
-
-
-            let mut sub_traces = traverse(&connection, &end, trace_copy, game_grid_nodes, cache);
-            // let mut sub_traces = vec![];
-            // if let Some(shortest_sub) = sub_traces
-            //     .iter()
-            //     // .map(|item| item.len())
-            //     .min_by(|a, b| a.len().cmp(&b.len()))
-            // {
-
-
-            //     if let Some(shortest) = traces
-            //         .iter()
-            //         // .map(|item| item.len())
-            //         .min_by(|a, b| a.len().cmp(&b.len()))
-            //     {
-
-
-            //     if shortest > shortest_sub {
-            //         traces.push(shortest_sub.clone());
-            // // println!("{} > {}", new_trace.len(), shortest);
-            //         // continue;
-            //     }
-            // }
-            // }
-
-
-            // println!("{:?}", sub_traces.len());
-
-            // let mut path_results = traverse(&connection, end, new_trace, &game_grid_nodes);
-            
-            // for sub_trace in sub_traces.iter() {
-            //     // println!("{:?}", i);
-            //     if !traces.contains(sub_trace) {
-            //         traces.push(sub_trace.clone());
-            //     }
-            // }
-            traces.append(&mut sub_traces);
+            traverse(&connection, &end, trace_copy, game_grid_nodes, cache, traces);
         }
 
     }
 
-    traces
 }
 
 // // (col, row)
