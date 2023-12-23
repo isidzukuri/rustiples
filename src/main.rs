@@ -1,6 +1,7 @@
 use std::vec;
 
 use bevy::prelude::*;
+use bevy::transform::commands;
 use bevy::window::PrimaryWindow;
 use bevy::window::WindowResolution;
 
@@ -78,7 +79,7 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
         // let g = rand::thread_rng().gen_range(0.4..0.5);
         // let b = rand::thread_rng().gen_range(0.0..0.2);
         // let color = Color::rgb(r, g, b);
-        let random_num: u16 = rand::thread_rng().gen_range(1..50000);
+        let random_num: u16 = rand::thread_rng().gen_range(1..5);
 
         commands.spawn((
             SpriteBundle {
@@ -118,6 +119,7 @@ pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
+    mut commands: Commands,
     mut game_grid_nodes: Query<(&mut Sprite, &mut GraphNode), With<GraphNode>>,
 ) {
     let window = windows.single();
@@ -171,11 +173,28 @@ pub fn grid_click(
             }
 
             if route_heads.len() > 1 {
-                find_route(
-                    route_heads[0],
-                    route_heads[1],
+                let path = find_path(
+                    &route_heads[0],
+                    &route_heads[1],
                     &game_grid_nodes.iter().map(|(_, node)| node).collect(),
                 );
+                // let route = traverse(&start, &end, game_grid_nodes);
+                // println!("result: {:?}", path);
+                match path {
+                    None => { print_world_info(commands, "There is no path!!!".to_string()) },
+                    Some(nodes) => {
+
+                        for path_node in nodes.iter() {
+                            if let Some((mut sprite, mut node)) = game_grid_nodes
+                                .iter_mut()
+                                .find(|(_, ref node)| node.col == path_node.0 && node.row == path_node.1)
+                            {
+                                sprite.color = Color::PURPLE;
+                                node.node_type = GraphNodeType::RoutePoint;
+                            };
+                        }
+                    }
+                }
             }
         }
     }
@@ -183,39 +202,41 @@ pub fn grid_click(
 
 // use bevy::ecs::query::QueryIter;
 
-pub fn find_route(start: (u32, u32), end: (u32, u32), game_grid_nodes: &Vec<&GraphNode>) {
-    // let mut routes : Vec<(f32, Vec<GraphNode>)> = vec![];
+// pub fn find_route(start: (u32, u32), end: (u32, u32), game_grid_nodes: &Vec<&GraphNode>) {
+//     // let mut routes : Vec<(f32, Vec<GraphNode>)> = vec![];
 
-    // let nodes: Vec<&GraphNode> = game_grid_nodes.map(|(_, node)| node).collect();
+//     // let nodes: Vec<&GraphNode> = game_grid_nodes.map(|(_, node)| node).collect();
 
-    // println!("{:?}", game_grid_nodes);
+//     // println!("{:?}", game_grid_nodes);
 
-    // let mut traces =
-    // let mut traces: Vec<Vec<(u32, u32)>> = vec![];
+//     // let mut traces =
+//     // let mut traces: Vec<Vec<(u32, u32)>> = vec![];
 
-    // traverse(&start, &end, vec![], game_grid_nodes, &mut vec![], &mut traces);
-    // println!("{:?}", r);
+//     // traverse(&start, &end, vec![], game_grid_nodes, &mut vec![], &mut traces);
+//     // println!("{:?}", r);
 
-    // r.dedup();
+//     // r.dedup();
 
-    // for i in traces.iter() {
-    //     println!("{:?}", i);
-    // }
-    // println!("len: {:?}", traces.len());
+//     // for i in traces.iter() {
+//     //     println!("{:?}", i);
+//     // }
+//     // println!("len: {:?}", traces.len());
 
-    // let mut visited: Vec<(u32, u32)> = vec![];
+//     // let mut visited: Vec<(u32, u32)> = vec![];
 
-    // let r = traverse(&start, &end, game_grid_nodes, &mut vec![], &mut vec![]);
-    // println!("result: {:?}", r);
-    let r = traverse(&start, &end, game_grid_nodes);
-    println!("result: {:?}", r);
+//     // let r = traverse(&start, &end, game_grid_nodes, &mut vec![], &mut vec![]);
+//     // println!("result: {:?}", r);
+    
 
-}
+
+
+
+// }
 
 
 use std::collections::HashMap;
 // (col, row)
-pub fn traverse(
+pub fn find_path(
     start_node: &(u32, u32),
     end_node: &(u32, u32),
     game_grid_nodes: &Vec<&GraphNode>,
