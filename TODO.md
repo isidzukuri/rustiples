@@ -1,4 +1,10 @@
-- unit tests
-- world info
-- generate grid
-- generate maze
+- unit tests for grid
+- wrap blocked grid cells into images. Mountains, rivers, trees, etc...
+- add some audio
+- write smtn with state
+- use events for smtn
+- detect lines for rivers
+- generate obstacles on the grid: lines for rivers, cellgroups for mountaiins and ponds
+- add animated sprites
+- castle screen: enter castle, screen building
+- map state save
