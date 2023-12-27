@@ -245,7 +245,7 @@ pub fn spawn_control_buttons(
 }
 
 pub fn button_pressed_event_listener(mut listener: EventReader<ButtonPressedEvent>) {
-    for event in listener.iter() {
+    for event in listener.read() {
         if event.event_type == "export_grid".to_string() {
             println!("Grid entity exported to");
         }

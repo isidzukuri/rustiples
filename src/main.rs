@@ -1,9 +1,8 @@
 use bevy::prelude::*;
 use bevy::window::WindowResolution;
 
-use rustilples::buttons;
 use rustilples::buttons::ButtonsPlugin;
-use rustilples::camera::{self, CameraPlugin};
+use rustilples::camera::CameraPlugin;
 use rustilples::cursor::CursorPlugin;
 use rustilples::fps::FpsPlugin;
 use rustilples::game_grid::GameGridPlugin;
