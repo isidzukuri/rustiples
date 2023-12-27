@@ -1,9 +1,9 @@
 use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
 use bevy::window::WindowResolution;
 
 use rustilples::buttons;
 use rustilples::buttons::ButtonsPlugin;
+use rustilples::camera::{self, CameraPlugin};
 use rustilples::cursor::CursorPlugin;
 use rustilples::fps::FpsPlugin;
 use rustilples::game_grid::GameGridPlugin;
@@ -19,27 +19,18 @@ fn main() {
             }),
             ..default()
         }))
+        .add_plugins(CameraPlugin)
         .add_plugins(FpsPlugin)
         .add_plugins(WorldInfoPlugin)
-        .add_systems(Startup, spawn_camera)
         .add_plugins(CursorPlugin)
         .add_plugins(GameGridPlugin)
         .add_plugins(ButtonsPlugin)
         .run();
 }
 
-pub fn spawn_camera(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
-    let window = window_query.get_single().unwrap();
-
-    commands.spawn(Camera2dBundle {
-        transform: Transform::from_xyz(window.width() / 2.0, window.height() / 2.0, 0.0),
-        ..default()
-    });
-}
-
-#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-pub enum AppState {
-    #[default]
-    InWorld,
-    InCastle,
-}
+// #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
+// pub enum AppState {
+//     #[default]
+//     InWorld,
+//     InCastle,
+// }
