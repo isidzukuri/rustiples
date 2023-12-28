@@ -8,3 +8,5 @@
 - add animated sprites
 - castle screen: enter castle, screen building
 - map state save
+- render castle on grid. create special castle cells and group them behind sprite. ckick on any should open castle screen.
+- combine maze and czstle in grid generation

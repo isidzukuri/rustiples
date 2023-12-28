@@ -1,15 +1,19 @@
 use crate::buttons::*;
-use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use bevy::{ecs::bundle, prelude::*};
 use rand::Rng;
 use std::collections::HashMap;
 
-use super::{GraphNode, GraphNodeType};
+use super::{Castle, GraphNode, GraphNodeType};
 
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
 
-pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
+pub fn generate_grid(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+) {
     let window = window_query.get_single().unwrap();
 
     let width_in_cells = (window.width() / GRID_CELL_WIDTH) as u32;
@@ -17,6 +21,9 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
 
     let mut col_index = 0u32;
     let mut row_index = 0u32;
+
+    let castle = alocate_castle(width_in_cells, height_in_cells);
+
     loop {
         if row_index == height_in_cells && col_index == 0 {
             break;
@@ -25,12 +32,16 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
         let x = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * col_index as f32;
         let y = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * row_index as f32;
 
-        let random_num: u16 = rand::thread_rng().gen_range(1..5);
+        let random_num: u16 = rand::thread_rng().gen_range(1..25);
+
+        let is_castle = castle.is_catle_cell(&col_index, &row_index);
 
         commands.spawn((
             SpriteBundle {
                 sprite: Sprite {
-                    color: if random_num == 1 {
+                    color: if is_castle {
+                        Color::GOLD
+                    } else if random_num == 1 {
                         Color::ORANGE
                     } else {
                         Color::GRAY
@@ -44,7 +55,9 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
             GraphNode {
                 row: row_index,
                 col: col_index,
-                node_type: if random_num == 1 {
+                node_type: if is_castle {
+                    GraphNodeType::Castle
+                } else if random_num == 1 {
                     GraphNodeType::Blocked
                 } else {
                     GraphNodeType::Standard
@@ -58,6 +71,47 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
             row_index += 1;
         };
     }
+
+    spawn_castle(commands, asset_server, castle)
+}
+
+pub fn alocate_castle(window_width_in_cells: u32, window_height_in_cells: u32) -> Castle {
+    let sprite_width = 350.0f32;
+    let sprite_height = 250.0f32;
+
+    let width_in_cells = (sprite_width / GRID_CELL_WIDTH).ceil() as u32;
+    let height_in_cells = (sprite_height / GRID_CELL_WIDTH).ceil() as u32;
+
+    let max_x_cell = window_width_in_cells - width_in_cells;
+    let max_y_cell = window_height_in_cells - height_in_cells;
+
+    let position_x_cell: u32 = rand::thread_rng().gen_range(0..max_x_cell);
+    let position_y_cell: u32 = rand::thread_rng().gen_range(1..max_y_cell);
+
+    Castle {
+        width_px: sprite_width,
+        height_px: sprite_height,
+        width_cells: width_in_cells,
+        height_cells: height_in_cells,
+        from_x_cell: position_x_cell,
+        from_y_cell: position_y_cell,
+        to_x_cell: position_x_cell + width_in_cells - 1,
+        to_y_cell: position_y_cell + height_in_cells - 1,
+    }
+}
+
+pub fn spawn_castle(mut commands: Commands, asset_server: Res<AssetServer>, castle: Castle) {
+    let x = (castle.from_x_cell as f32 * GRID_CELL_WIDTH + castle.width_px / 2.0) as f32;
+    let y = (castle.from_y_cell as f32 * GRID_CELL_WIDTH + castle.height_px / 2.0) as f32;
+    let transform = Transform::from_xyz(x, y, 0.0);
+    commands.spawn((
+        SpriteBundle {
+            transform: transform,
+            texture: asset_server.load("sprites/castle.png"),
+            ..default()
+        },
+        castle,
+    ));
 }
 
 pub fn grid_click(
