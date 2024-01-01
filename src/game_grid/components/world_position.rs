@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone)]
 pub struct WorldPosition {
     pub width_px: f32,
     pub height_px: f32,
@@ -113,4 +113,3 @@ impl WorldPosition {
         }
     }
 }
-

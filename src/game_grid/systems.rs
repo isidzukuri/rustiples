@@ -7,8 +7,8 @@ use std::iter;
 
 use super::axe::*;
 use super::castle::*;
-use super::hero::*;
 use super::graph_node::*;
+use super::hero::*;
 use super::world_position::*;
 use super::*;
 
@@ -44,7 +44,6 @@ pub fn generate_grid(
         let is_castle = castle_positions
             .iter()
             .any(|position| position.is_owned_cell(&col_index, &row_index));
-
 
         let is_hero = heroes_positions
             .iter()
@@ -99,14 +98,47 @@ pub fn generate_grid(
     }
 
     for position in castle_positions {
-        spawn_castle(&mut commands, &asset_server, position)
+        let obj = Castle {
+            world_position: position.clone(),
+        };
+        spawn_sprite(&mut commands, &asset_server, obj, position, Castle::SPRITE)
     }
     for position in heroes_positions {
-        spawn_hero(&mut commands, &asset_server, position)
+        let obj = Hero {
+            world_position: position.clone(),
+        };
+        spawn_sprite(&mut commands, &asset_server, obj, position, Hero::SPRITE)
     }
     for position in axes_positions {
-        spawn_axe(&mut commands, &asset_server, position)
+        let obj = Axe {
+            world_position: position.clone(),
+        };
+        spawn_sprite(&mut commands, &asset_server, obj, position, Axe::SPRITE)
     }
+}
+
+pub fn spawn_sprite<T>(
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    object: T,
+    world_position: WorldPosition,
+    asset_path: &'static str,
+) where
+    (bevy::prelude::SpriteBundle, T): Bundle,
+{
+    let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
+        as f32;
+    let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
+        as f32;
+    let transform = Transform::from_xyz(x, y, 0.0);
+    commands.spawn((
+        SpriteBundle {
+            transform: transform,
+            texture: asset_server.load(asset_path),
+            ..default()
+        },
+        object,
+    ));
 }
 
 pub fn allocate_heroes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
@@ -120,29 +152,6 @@ pub fn allocate_heroes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<World
     )]
 }
 
-pub fn spawn_hero(
-    mut commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-    world_position: WorldPosition,
-) {
-    let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
-        as f32;
-    let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
-        as f32;
-    let transform = Transform::from_xyz(x, y, 0.0);
-    commands.spawn((
-        SpriteBundle {
-            transform: transform,
-            texture: asset_server.load("sprites/hero.png"),
-            ..default()
-        },
-        Hero {
-            world_position: world_position,
-        },
-    ));
-}
-
-
 pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
     vec![WorldPosition::alocate_at(
         &0,
@@ -153,30 +162,6 @@ pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPo
         &Axe::MARGIN,
     )]
 }
-
-pub fn spawn_axe(
-    mut commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-    world_position: WorldPosition,
-) {
-    let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
-        as f32;
-    let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
-        as f32;
-    let transform = Transform::from_xyz(x, y, 0.0);
-    commands.spawn((
-        SpriteBundle {
-            transform: transform,
-            texture: asset_server.load("sprites/axe.png"),
-            ..default()
-        },
-        Axe {
-            world_position: world_position,
-        },
-    ));
-}
-
-
 
 pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
     let mut castle_positions = vec![];
@@ -211,28 +196,6 @@ pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<Worl
         castle_positions.push(castle_position);
     }
     castle_positions
-}
-
-pub fn spawn_castle(
-    mut commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-    world_position: WorldPosition,
-) {
-    let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
-        as f32;
-    let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
-        as f32;
-    let transform = Transform::from_xyz(x, y, 0.0);
-    commands.spawn((
-        SpriteBundle {
-            transform: transform,
-            texture: asset_server.load("sprites/castle.png"),
-            ..default()
-        },
-        Castle {
-            world_position: world_position,
-        },
-    ));
 }
 
 pub fn grid_click(

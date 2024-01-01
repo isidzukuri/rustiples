@@ -9,7 +9,7 @@ pub enum GraphNodeType {
     Castle,
     Tree,
     Axe,
-    Hero
+    Hero,
 }
 
 #[derive(Component, Debug)]
