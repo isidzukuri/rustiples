@@ -6,6 +6,7 @@ pub enum GraphNodeType {
     Blocked,
     RouteHead,
     RoutePoint,
+    Castle,
 }
 
 #[derive(Component, Debug)]
