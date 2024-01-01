@@ -4,7 +4,7 @@ use bevy::{ecs::bundle, prelude::*};
 use rand::Rng;
 use std::collections::HashMap;
 
-use super::{Castle, GraphNode, GraphNodeType};
+use super::{Castle, GraphNode, GraphNodeType, WorldPosition};
 
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
@@ -22,7 +22,7 @@ pub fn generate_grid(
     let mut col_index = 0u32;
     let mut row_index = 0u32;
 
-    let castle = alocate_castle(width_in_cells, height_in_cells);
+    let castle_position = alocate_castle_position(width_in_cells, height_in_cells);
 
     loop {
         if row_index == height_in_cells && col_index == 0 {
@@ -34,7 +34,7 @@ pub fn generate_grid(
 
         let random_num: u16 = rand::thread_rng().gen_range(1..25);
 
-        let is_castle = castle.is_catle_cell(&col_index, &row_index);
+        let is_castle = castle_position.is_owned_cell(&col_index, &row_index);
 
         commands.spawn((
             SpriteBundle {
@@ -72,10 +72,13 @@ pub fn generate_grid(
         };
     }
 
-    spawn_castle(commands, asset_server, castle)
+    spawn_castle(commands, asset_server, castle_position)
 }
 
-pub fn alocate_castle(window_width_in_cells: u32, window_height_in_cells: u32) -> Castle {
+pub fn alocate_castle_position(
+    window_width_in_cells: u32,
+    window_height_in_cells: u32,
+) -> WorldPosition {
     let sprite_width = 350.0f32;
     let sprite_height = 250.0f32;
 
@@ -88,7 +91,7 @@ pub fn alocate_castle(window_width_in_cells: u32, window_height_in_cells: u32) -
     let position_x_cell: u32 = rand::thread_rng().gen_range(0..max_x_cell);
     let position_y_cell: u32 = rand::thread_rng().gen_range(1..max_y_cell);
 
-    Castle {
+    WorldPosition {
         width_px: sprite_width,
         height_px: sprite_height,
         width_cells: width_in_cells,
@@ -100,9 +103,15 @@ pub fn alocate_castle(window_width_in_cells: u32, window_height_in_cells: u32) -
     }
 }
 
-pub fn spawn_castle(mut commands: Commands, asset_server: Res<AssetServer>, castle: Castle) {
-    let x = (castle.from_x_cell as f32 * GRID_CELL_WIDTH + castle.width_px / 2.0) as f32;
-    let y = (castle.from_y_cell as f32 * GRID_CELL_WIDTH + castle.height_px / 2.0) as f32;
+pub fn spawn_castle(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    world_position: WorldPosition,
+) {
+    let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
+        as f32;
+    let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
+        as f32;
     let transform = Transform::from_xyz(x, y, 0.0);
     commands.spawn((
         SpriteBundle {
@@ -110,7 +119,9 @@ pub fn spawn_castle(mut commands: Commands, asset_server: Res<AssetServer>, cast
             texture: asset_server.load("sprites/castle.png"),
             ..default()
         },
-        castle,
+        Castle {
+            world_position: world_position,
+        },
     ));
 }
 
