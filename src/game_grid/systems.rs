@@ -1,15 +1,23 @@
 use crate::buttons::*;
-use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use bevy::{ecs::bundle, prelude::*};
 use rand::Rng;
 use std::collections::HashMap;
+use std::iter;
 
-use super::{GraphNode, GraphNodeType};
+use super::castle::*;
+use super::graph_node::*;
+use super::world_position::*;
+use super::*;
 
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
 
-pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
+pub fn generate_grid(
+    mut commands: Commands,
+    window_query: Query<&Window, With<PrimaryWindow>>,
+    asset_server: Res<AssetServer>,
+) {
     let window = window_query.get_single().unwrap();
 
     let width_in_cells = (window.width() / GRID_CELL_WIDTH) as u32;
@@ -17,6 +25,8 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
 
     let mut col_index = 0u32;
     let mut row_index = 0u32;
+
+    let mut castel_positions = allocate_castles(&width_in_cells, &height_in_cells);
     loop {
         if row_index == height_in_cells && col_index == 0 {
             break;
@@ -25,12 +35,18 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
         let x = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * col_index as f32;
         let y = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * row_index as f32;
 
-        let random_num: u16 = rand::thread_rng().gen_range(1..5);
+        let random_num: u16 = rand::thread_rng().gen_range(1..25);
+
+        let is_castle = castel_positions
+            .iter()
+            .any(|position| position.is_owned_cell(&col_index, &row_index));
 
         commands.spawn((
             SpriteBundle {
                 sprite: Sprite {
-                    color: if random_num == 1 {
+                    color: if is_castle {
+                        Color::GOLD
+                    } else if random_num == 1 {
                         Color::ORANGE
                     } else {
                         Color::GRAY
@@ -44,7 +60,9 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
             GraphNode {
                 row: row_index,
                 col: col_index,
-                node_type: if random_num == 1 {
+                node_type: if is_castle {
+                    GraphNodeType::Castle
+                } else if random_num == 1 {
                     GraphNodeType::Blocked
                 } else {
                     GraphNodeType::Standard
@@ -58,6 +76,67 @@ pub fn generate_grid(mut commands: Commands, window_query: Query<&Window, With<P
             row_index += 1;
         };
     }
+
+    for position in castel_positions {
+        spawn_castle(&mut commands, &asset_server, position)
+    }
+}
+
+pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+    let mut castel_positions = vec![];
+    let mut generations_count = 0;
+    for num in 0..2 {
+        let mut castle_position = WorldPosition::alocate_new_position(
+            &Castle::SPRITE_WIDTH,
+            &Castle::SPRITE_HEIGHT,
+            width_in_cells,
+            height_in_cells,
+            &GRID_CELL_WIDTH,
+            &Castle::MARGIN,
+        );
+
+        while castel_positions
+            .iter()
+            .any(|position| castle_position.intersects_with(position))
+        {
+            castle_position = WorldPosition::alocate_new_position(
+                &Castle::SPRITE_WIDTH,
+                &Castle::SPRITE_HEIGHT,
+                &width_in_cells,
+                &height_in_cells,
+                &&GRID_CELL_WIDTH,
+                &Castle::MARGIN,
+            );
+            generations_count += 1;
+            if generations_count == 25 {
+                panic!("world is to small to fit all castles")
+            }
+        }
+        castel_positions.push(castle_position);
+    }
+    castel_positions
+}
+
+pub fn spawn_castle(
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    world_position: WorldPosition,
+) {
+    let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
+        as f32;
+    let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
+        as f32;
+    let transform = Transform::from_xyz(x, y, 0.0);
+    commands.spawn((
+        SpriteBundle {
+            transform: transform,
+            texture: asset_server.load("sprites/castle.png"),
+            ..default()
+        },
+        Castle {
+            world_position: world_position,
+        },
+    ));
 }
 
 pub fn grid_click(
@@ -245,7 +324,7 @@ pub fn spawn_control_buttons(
 }
 
 pub fn button_pressed_event_listener(mut listener: EventReader<ButtonPressedEvent>) {
-    for event in listener.iter() {
+    for event in listener.read() {
         if event.event_type == "export_grid".to_string() {
             println!("Grid entity exported to");
         }

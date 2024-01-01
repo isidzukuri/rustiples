@@ -1,9 +1,8 @@
 use bevy::prelude::*;
 use bevy::window::WindowResolution;
 
-use rustilples::buttons;
 use rustilples::buttons::ButtonsPlugin;
-use rustilples::camera::{self, CameraPlugin};
+use rustilples::camera::CameraPlugin;
 use rustilples::cursor::CursorPlugin;
 use rustilples::fps::FpsPlugin;
 use rustilples::game_grid::GameGridPlugin;
@@ -14,7 +13,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                resolution: WindowResolution::new(1000., 800.).with_scale_factor_override(1.0),
+                resolution: WindowResolution::new(1200., 1000.).with_scale_factor_override(1.0),
                 ..default()
             }),
             ..default()

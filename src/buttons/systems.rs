@@ -1,8 +1,7 @@
 use super::{ButtonPressedEvent, ClickableButton, Menu};
-use bevy::{prelude::*, reflect::erased_serde::Error};
+use bevy::prelude::*;
 
-pub fn spawn_menu(mut commands: &mut Commands, asset_server: Res<AssetServer>) -> Entity {
-    println!("spawn_menu spawn_menu spawn_menu spawn_menu");
+pub fn spawn_menu(mut commands: &mut Commands) -> Entity {
     commands
         .spawn((
             Menu {},
@@ -29,12 +28,12 @@ pub fn spawn_button(
     label: String,
     event_type: String,
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    _asset_server: Res<AssetServer>,
     mut query: Query<Entity, With<Menu>>,
 ) {
     let mut menu = match query.get_single_mut() {
         Ok(entity) => entity,
-        Error => spawn_menu(&mut commands, asset_server),
+        _error => spawn_menu(&mut commands),
     };
 
     let button = commands
