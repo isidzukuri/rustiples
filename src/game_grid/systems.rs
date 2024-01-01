@@ -5,7 +5,10 @@ use rand::Rng;
 use std::collections::HashMap;
 use std::iter;
 
-use super::{Castle, GraphNode, GraphNodeType, WorldPosition};
+use super::castle::*;
+use super::graph_node::*;
+use super::world_position::*;
+use super::*;
 
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;

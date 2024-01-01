@@ -1,22 +1,6 @@
 use bevy::prelude::*;
 use rand::Rng;
 
-#[derive(Debug, PartialEq)]
-pub enum GraphNodeType {
-    Standard,
-    Blocked,
-    RouteHead,
-    RoutePoint,
-    Castle,
-}
-
-#[derive(Component, Debug)]
-pub struct GraphNode {
-    pub row: u32,
-    pub col: u32,
-    pub node_type: GraphNodeType,
-}
-
 #[derive(Component, Debug)]
 pub struct WorldPosition {
     pub width_px: f32,
@@ -81,7 +65,7 @@ impl WorldPosition {
         window_width_in_cells: &u32,
         window_height_in_cells: &u32,
         cell_size: &f32,
-        margin: &(u32, u32, u32, u32),
+        margin: &(u32, u32, u32, u32), // clockwise from 12
     ) -> Self {
         let width_in_cells = (sprite_width / cell_size).ceil() as u32;
         let height_in_cells = (sprite_height / cell_size).ceil() as u32;
@@ -104,15 +88,4 @@ impl WorldPosition {
             margin: *margin,
         }
     }
-}
-
-#[derive(Component, Debug)]
-pub struct Castle {
-    pub world_position: WorldPosition,
-}
-
-impl Castle {
-    pub const MARGIN: (u32, u32, u32, u32) = (1, 1, 1, 1);
-    pub const SPRITE_WIDTH: f32 = 350.0f32;
-    pub const SPRITE_HEIGHT: f32 = 250.0f32;
 }
