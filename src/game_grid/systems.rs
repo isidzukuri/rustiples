@@ -3,6 +3,7 @@ use bevy::window::PrimaryWindow;
 use bevy::{ecs::bundle, prelude::*};
 use rand::Rng;
 use std::collections::HashMap;
+use std::iter;
 
 use super::{Castle, GraphNode, GraphNodeType, WorldPosition};
 
@@ -22,8 +23,7 @@ pub fn generate_grid(
     let mut col_index = 0u32;
     let mut row_index = 0u32;
 
-    let castle_position = alocate_castle_position(width_in_cells, height_in_cells);
-
+    let mut castel_positions = allocate_castles(&width_in_cells, &height_in_cells);
     loop {
         if row_index == height_in_cells && col_index == 0 {
             break;
@@ -34,7 +34,9 @@ pub fn generate_grid(
 
         let random_num: u16 = rand::thread_rng().gen_range(1..25);
 
-        let is_castle = castle_position.is_owned_cell(&col_index, &row_index);
+        let is_castle = castel_positions
+            .iter()
+            .any(|position| position.is_owned_cell(&col_index, &row_index));
 
         commands.spawn((
             SpriteBundle {
@@ -72,40 +74,49 @@ pub fn generate_grid(
         };
     }
 
-    spawn_castle(commands, asset_server, castle_position)
-}
-
-pub fn alocate_castle_position(
-    window_width_in_cells: u32,
-    window_height_in_cells: u32,
-) -> WorldPosition {
-    let sprite_width = 350.0f32;
-    let sprite_height = 250.0f32;
-
-    let width_in_cells = (sprite_width / GRID_CELL_WIDTH).ceil() as u32;
-    let height_in_cells = (sprite_height / GRID_CELL_WIDTH).ceil() as u32;
-
-    let max_x_cell = window_width_in_cells - width_in_cells;
-    let max_y_cell = window_height_in_cells - height_in_cells;
-
-    let position_x_cell: u32 = rand::thread_rng().gen_range(0..max_x_cell);
-    let position_y_cell: u32 = rand::thread_rng().gen_range(1..max_y_cell);
-
-    WorldPosition {
-        width_px: sprite_width,
-        height_px: sprite_height,
-        width_cells: width_in_cells,
-        height_cells: height_in_cells,
-        from_x_cell: position_x_cell,
-        from_y_cell: position_y_cell,
-        to_x_cell: position_x_cell + width_in_cells - 1,
-        to_y_cell: position_y_cell + height_in_cells - 1,
+    for position in castel_positions {
+        spawn_castle(&mut commands, &asset_server, position)
     }
 }
 
+pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+    let mut castel_positions = vec![];
+    let mut generations_count = 0;
+    for num in 0..2 {
+        let mut castle_position = WorldPosition::alocate_new_position(
+            &Castle::SPRITE_WIDTH,
+            &Castle::SPRITE_HEIGHT,
+            width_in_cells,
+            height_in_cells,
+            &GRID_CELL_WIDTH,
+            &Castle::MARGIN,
+        );
+
+        while castel_positions
+            .iter()
+            .any(|position| castle_position.intersects_with(position))
+        {
+            castle_position = WorldPosition::alocate_new_position(
+                &Castle::SPRITE_WIDTH,
+                &Castle::SPRITE_HEIGHT,
+                &width_in_cells,
+                &height_in_cells,
+                &&GRID_CELL_WIDTH,
+                &Castle::MARGIN,
+            );
+            generations_count += 1;
+            if generations_count == 25 {
+                panic!("world is to small to fit all castles")
+            }
+        }
+        castel_positions.push(castle_position);
+    }
+    castel_positions
+}
+
 pub fn spawn_castle(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
     world_position: WorldPosition,
 ) {
     let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
