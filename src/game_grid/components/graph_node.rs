@@ -7,6 +7,9 @@ pub enum GraphNodeType {
     RouteHead,
     RoutePoint,
     Castle,
+    Tree,
+    Axe,
+    Hero
 }
 
 #[derive(Component, Debug)]

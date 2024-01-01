@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::iter;
 
 use super::castle::*;
+use super::hero::*;
 use super::graph_node::*;
 use super::world_position::*;
 use super::*;
@@ -26,7 +27,8 @@ pub fn generate_grid(
     let mut col_index = 0u32;
     let mut row_index = 0u32;
 
-    let mut castel_positions = allocate_castles(&width_in_cells, &height_in_cells);
+    let mut castle_positions = allocate_castles(&width_in_cells, &height_in_cells);
+    let mut heroes_positions = allocate_heroes(&width_in_cells, &height_in_cells);
     loop {
         if row_index == height_in_cells && col_index == 0 {
             break;
@@ -37,7 +39,12 @@ pub fn generate_grid(
 
         let random_num: u16 = rand::thread_rng().gen_range(1..25);
 
-        let is_castle = castel_positions
+        let is_castle = castle_positions
+            .iter()
+            .any(|position| position.is_owned_cell(&col_index, &row_index));
+
+
+        let is_hero = heroes_positions
             .iter()
             .any(|position| position.is_owned_cell(&col_index, &row_index));
 
@@ -46,6 +53,8 @@ pub fn generate_grid(
                 sprite: Sprite {
                     color: if is_castle {
                         Color::GOLD
+                    } else if is_hero {
+                        Color::ANTIQUE_WHITE
                     } else if random_num == 1 {
                         Color::ORANGE
                     } else {
@@ -62,6 +71,8 @@ pub fn generate_grid(
                 col: col_index,
                 node_type: if is_castle {
                     GraphNodeType::Castle
+                } else if is_hero {
+                    GraphNodeType::Hero
                 } else if random_num == 1 {
                     GraphNodeType::Blocked
                 } else {
@@ -77,13 +88,51 @@ pub fn generate_grid(
         };
     }
 
-    for position in castel_positions {
+    for position in castle_positions {
         spawn_castle(&mut commands, &asset_server, position)
+    }
+    for position in heroes_positions {
+        spawn_hero(&mut commands, &asset_server, position)
     }
 }
 
+pub fn allocate_heroes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+    vec![WorldPosition::alocate_at(
+        &0,
+        &0,
+        &Hero::SPRITE_WIDTH,
+        &Hero::SPRITE_HEIGHT,
+        &&GRID_CELL_WIDTH,
+        &Hero::MARGIN,
+    )]
+}
+
+pub fn spawn_hero(
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    world_position: WorldPosition,
+) {
+    let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
+        as f32;
+    let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
+        as f32;
+    let transform = Transform::from_xyz(x, y, 0.0);
+    commands.spawn((
+        SpriteBundle {
+            transform: transform,
+            texture: asset_server.load("sprites/hero.png"),
+            ..default()
+        },
+        Hero {
+            world_position: world_position,
+        },
+    ));
+}
+
+
+
 pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
-    let mut castel_positions = vec![];
+    let mut castle_positions = vec![];
     let mut generations_count = 0;
     for num in 0..2 {
         let mut castle_position = WorldPosition::alocate_new_position(
@@ -95,7 +144,7 @@ pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<Worl
             &Castle::MARGIN,
         );
 
-        while castel_positions
+        while castle_positions
             .iter()
             .any(|position| castle_position.intersects_with(position))
         {
@@ -112,9 +161,9 @@ pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<Worl
                 panic!("world is to small to fit all castles")
             }
         }
-        castel_positions.push(castle_position);
+        castle_positions.push(castle_position);
     }
-    castel_positions
+    castle_positions
 }
 
 pub fn spawn_castle(
