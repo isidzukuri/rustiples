@@ -9,6 +9,7 @@ use super::axe::*;
 use super::castle::*;
 use super::graph_node::*;
 use super::hero::*;
+use super::tree::*;
 use super::world_position::*;
 use super::*;
 
@@ -31,6 +32,7 @@ pub fn generate_grid(
     let castle_positions = allocate_castles(&width_in_cells, &height_in_cells);
     let heroes_positions = allocate_heroes(&width_in_cells, &height_in_cells);
     let axes_positions = allocate_axes(&width_in_cells, &height_in_cells);
+    let trees_positions = allocate_trees(&width_in_cells, &height_in_cells);
     loop {
         if row_index == height_in_cells && col_index == 0 {
             break;
@@ -53,6 +55,10 @@ pub fn generate_grid(
             .iter()
             .any(|position| position.is_owned_cell(&col_index, &row_index));
 
+        let is_tree = trees_positions
+            .iter()
+            .any(|position| position.is_owned_cell(&col_index, &row_index));
+
         commands.spawn((
             SpriteBundle {
                 sprite: Sprite {
@@ -62,6 +68,8 @@ pub fn generate_grid(
                         Color::ANTIQUE_WHITE
                     } else if is_axe {
                         Color::INDIGO
+                    } else if is_tree {
+                        Color::LIME_GREEN
                     } else if random_num == 1 {
                         Color::ORANGE
                     } else {
@@ -82,6 +90,8 @@ pub fn generate_grid(
                     GraphNodeType::Hero
                 } else if is_axe {
                     GraphNodeType::Axe
+                } else if is_tree {
+                    GraphNodeType::Tree
                 } else if random_num == 1 {
                     GraphNodeType::Blocked
                 } else {
@@ -114,6 +124,12 @@ pub fn generate_grid(
             world_position: position.clone(),
         };
         spawn_sprite(&mut commands, &asset_server, obj, position, Axe::SPRITE)
+    }
+    for position in trees_positions {
+        let obj = Tree {
+            world_position: position.clone(),
+        };
+        spawn_sprite(&mut commands, &asset_server, obj, position, Tree::SPRITE)
     }
 }
 
@@ -160,6 +176,16 @@ pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPo
         &Axe::SPRITE_HEIGHT,
         &&GRID_CELL_WIDTH,
         &Axe::MARGIN,
+    )]
+}
+pub fn allocate_trees(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+    vec![WorldPosition::alocate_at(
+        &1,
+        &0,
+        &Tree::SPRITE_WIDTH,
+        &Tree::SPRITE_HEIGHT,
+        &&GRID_CELL_WIDTH,
+        &Tree::MARGIN,
     )]
 }
 
