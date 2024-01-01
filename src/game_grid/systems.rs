@@ -5,6 +5,7 @@ use rand::Rng;
 use std::collections::HashMap;
 use std::iter;
 
+use super::axe::*;
 use super::castle::*;
 use super::hero::*;
 use super::graph_node::*;
@@ -27,8 +28,9 @@ pub fn generate_grid(
     let mut col_index = 0u32;
     let mut row_index = 0u32;
 
-    let mut castle_positions = allocate_castles(&width_in_cells, &height_in_cells);
-    let mut heroes_positions = allocate_heroes(&width_in_cells, &height_in_cells);
+    let castle_positions = allocate_castles(&width_in_cells, &height_in_cells);
+    let heroes_positions = allocate_heroes(&width_in_cells, &height_in_cells);
+    let axes_positions = allocate_axes(&width_in_cells, &height_in_cells);
     loop {
         if row_index == height_in_cells && col_index == 0 {
             break;
@@ -48,6 +50,10 @@ pub fn generate_grid(
             .iter()
             .any(|position| position.is_owned_cell(&col_index, &row_index));
 
+        let is_axe = axes_positions
+            .iter()
+            .any(|position| position.is_owned_cell(&col_index, &row_index));
+
         commands.spawn((
             SpriteBundle {
                 sprite: Sprite {
@@ -55,6 +61,8 @@ pub fn generate_grid(
                         Color::GOLD
                     } else if is_hero {
                         Color::ANTIQUE_WHITE
+                    } else if is_axe {
+                        Color::INDIGO
                     } else if random_num == 1 {
                         Color::ORANGE
                     } else {
@@ -73,6 +81,8 @@ pub fn generate_grid(
                     GraphNodeType::Castle
                 } else if is_hero {
                     GraphNodeType::Hero
+                } else if is_axe {
+                    GraphNodeType::Axe
                 } else if random_num == 1 {
                     GraphNodeType::Blocked
                 } else {
@@ -93,6 +103,9 @@ pub fn generate_grid(
     }
     for position in heroes_positions {
         spawn_hero(&mut commands, &asset_server, position)
+    }
+    for position in axes_positions {
+        spawn_axe(&mut commands, &asset_server, position)
     }
 }
 
@@ -124,6 +137,40 @@ pub fn spawn_hero(
             ..default()
         },
         Hero {
+            world_position: world_position,
+        },
+    ));
+}
+
+
+pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+    vec![WorldPosition::alocate_at(
+        &0,
+        &1,
+        &Axe::SPRITE_WIDTH,
+        &Axe::SPRITE_HEIGHT,
+        &&GRID_CELL_WIDTH,
+        &Axe::MARGIN,
+    )]
+}
+
+pub fn spawn_axe(
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    world_position: WorldPosition,
+) {
+    let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
+        as f32;
+    let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
+        as f32;
+    let transform = Transform::from_xyz(x, y, 0.0);
+    commands.spawn((
+        SpriteBundle {
+            transform: transform,
+            texture: asset_server.load("sprites/axe.png"),
+            ..default()
+        },
+        Axe {
             world_position: world_position,
         },
     ));
