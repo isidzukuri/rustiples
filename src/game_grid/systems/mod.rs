@@ -20,7 +20,8 @@ pub fn grid_click(
     let window = windows.single();
 
     if mouse.just_pressed(MouseButton::Right) {
-        
+        make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RoutePoint);
+        make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RouteHead);
     } else if mouse.just_pressed(MouseButton::Left) {
         let (camera, camera_transform) = camera.single();
 
@@ -80,4 +81,18 @@ pub fn grid_click(
             }
         }
     }
+
+    pub fn make_nodes_standart(
+        mut game_grid_nodes: &mut Query<(&mut Sprite, &mut GraphNode), With<GraphNode>>,
+        node_type: GraphNodeType
+    ) {
+        for (mut sprite, mut node) in game_grid_nodes.iter_mut() {
+            if node.as_mut().node_type == node_type {
+                sprite.as_mut().color = Color::GRAY;
+                node.as_mut().node_type = GraphNodeType::Standard;
+            }
+        }
+
+    }
+
 }
