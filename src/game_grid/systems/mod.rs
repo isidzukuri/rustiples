@@ -17,25 +17,15 @@ pub fn grid_click(
     camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
     mut game_grid_nodes: Query<(&mut Sprite, &mut GraphNode), With<GraphNode>>,
 ) {
-    let window = windows.single();
-
     if mouse.just_pressed(MouseButton::Right) {
         make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RoutePoint);
         make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RouteHead);
+
+
+
+
     } else if mouse.just_pressed(MouseButton::Left) {
-        let (camera, camera_transform) = camera.single();
-
-        if let Some(position) = window
-            .cursor_position()
-            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
-            .map(|ray| ray.origin.truncate())
-        {
-            // println!("{:?}", position);
-
-            let col_index = ((position.x) / GRID_CELL_WIDTH).floor() as u32;
-            let row_index = ((position.y) / GRID_CELL_WIDTH).floor() as u32;
-            println!("{}, {}", row_index, col_index);
-
+        if let Some((row_index, col_index)) = detect_graph_node_click(windows, camera) {
             if let Some((mut sprite, mut node)) = game_grid_nodes
                 .iter_mut()
                 .find(|(_, ref node)| node.row == row_index && node.col == col_index)
@@ -93,6 +83,34 @@ pub fn grid_click(
             }
         }
 
+    }
+
+
+
+
+    pub fn detect_graph_node_click(
+        windows: Query<&Window, With<PrimaryWindow>>, 
+        camera: Query<(&Camera, &GlobalTransform), With<Camera>>) -> Option<(u32, u32)> {
+
+        let window = windows.single();
+        let (camera, camera_transform) = camera.single();
+
+        if let Some(position) = window
+            .cursor_position()
+            .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
+            .map(|ray| ray.origin.truncate())
+        {
+            // println!("{:?}", position);
+
+            let col_index = ((position.x) / GRID_CELL_WIDTH).floor() as u32;
+            let row_index = ((position.y) / GRID_CELL_WIDTH).floor() as u32;
+            
+            println!("{}, {}", row_index, col_index);
+            
+            Some((row_index, col_index))
+        } else {
+            None
+        }
     }
 
 }
