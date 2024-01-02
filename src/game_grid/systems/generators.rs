@@ -39,7 +39,7 @@ pub fn generate_grid(
         let x = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * col_index as f32;
         let y = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * row_index as f32;
 
-        let random_num: u16 = rand::thread_rng().gen_range(1..25);
+        let random_num: u16 = rand::thread_rng().gen_range(1..5000);
 
         let is_castle = castle_positions
             .iter()
@@ -168,8 +168,8 @@ pub fn allocate_heroes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<World
 
 pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
     vec![WorldPosition::alocate_at(
-        &0,
-        &2,
+        &1,
+        &12,
         &Axe::SPRITE_WIDTH,
         &Axe::SPRITE_HEIGHT,
         &&GRID_CELL_WIDTH,
@@ -178,13 +178,49 @@ pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPo
 }
 pub fn allocate_trees(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
     vec![WorldPosition::alocate_at(
-        &1,
+        &10,
         &0,
         &Tree::SPRITE_WIDTH,
         &Tree::SPRITE_HEIGHT,
         &&GRID_CELL_WIDTH,
         &Tree::MARGIN,
-    )]
+    ),
+    WorldPosition::alocate_at(
+        &10,
+        &1,
+        &Tree::SPRITE_WIDTH,
+        &Tree::SPRITE_HEIGHT,
+        &&GRID_CELL_WIDTH,
+        &Tree::MARGIN,
+    ),
+    WorldPosition::alocate_at(
+        &11,
+        &1,
+        &Tree::SPRITE_WIDTH,
+        &Tree::SPRITE_HEIGHT,
+        &&GRID_CELL_WIDTH,
+        &Tree::MARGIN,
+    ),
+    WorldPosition::alocate_at(
+        &12,
+        &1,
+        &Tree::SPRITE_WIDTH,
+        &Tree::SPRITE_HEIGHT,
+        &&GRID_CELL_WIDTH,
+        &Tree::MARGIN,
+    ),
+    WorldPosition::alocate_at(
+        &12,
+        &0,
+        &Tree::SPRITE_WIDTH,
+        &Tree::SPRITE_HEIGHT,
+        &&GRID_CELL_WIDTH,
+        &Tree::MARGIN,
+    )
+    
+    
+    
+    ]
 }
 
 pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {

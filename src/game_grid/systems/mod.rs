@@ -33,7 +33,7 @@ pub fn grid_click(
                 &game_grid_nodes.iter().map(|(_, node)| node).collect(),
             );
             match path {
-                None => {}
+                None => { println!("There is no way")}
                 // None => { print_world_info(commands, "There is no path!!!".to_string()) },
                 Some(nodes) => {
                     for path_node in nodes.iter() {
