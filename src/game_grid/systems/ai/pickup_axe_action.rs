@@ -21,7 +21,6 @@ impl Action for PickupAxeAction {
 
         if path_to_axe.is_some() {
             params.start_node = params.axe_position;
-            params.end_node = final_destination;
 
             if let Some(ref mut path) = state.path {
                 path.append(&mut path_to_axe.unwrap());
@@ -32,5 +31,6 @@ impl Action for PickupAxeAction {
             state.actions.push_front(Box::new(FindPathAction {}));
             params.graph_node_types.push(GraphNodeType::Tree);
         }
+        params.end_node = final_destination;
     }
 }
