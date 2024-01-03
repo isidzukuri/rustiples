@@ -20,7 +20,7 @@ pub struct State {
 }
 
 pub trait Action {
-    fn is_available(&self, params: &PathfindingParams) -> bool;
+    fn is_available(&self, params: &PathfindingParams) -> bool; //TODO: decouple actions with this
     fn exec(&self, params: &mut PathfindingParams, state: &mut State);
 }
 pub struct FindPathAction {}
@@ -55,9 +55,6 @@ impl Action for PickupAxeAction {
     }
 
     fn exec(&self, params: &mut PathfindingParams, state: &mut State) {
-        println!("PickupAxeAction");
-
-        println!("{:?}", params.end_node);
         let final_destination = params.end_node;
 
         params.end_node = params.axe_position;
