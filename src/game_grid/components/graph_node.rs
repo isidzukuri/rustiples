@@ -6,10 +6,11 @@ use lazy_static::lazy_static;
 lazy_static! {
     pub static ref PATHING_COST: HashMap<GraphNodeType, f32> = {
         HashMap::from([
-                (GraphNodeType::RouteHead, 1.0),
-                (GraphNodeType::Standard, 1.0),
-                (GraphNodeType::Tree, 4.0),
-            ])
+            (GraphNodeType::Axe, 1.0),
+            (GraphNodeType::RouteHead, 1.0),
+            (GraphNodeType::Standard, 1.0),
+            (GraphNodeType::Tree, 4.0),
+        ])
     };
 }
 

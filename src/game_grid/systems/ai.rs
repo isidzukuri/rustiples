@@ -1,20 +1,108 @@
 use crate::game_grid::graph_node::*;
-use std::collections::HashMap;
 use crate::game_grid::hero::Hero;
+use std::collections::HashMap;
+use std::collections::VecDeque;
 
 use crate::game_grid::pathfinding_params::*;
 
+// actions:
+// - find path [done]
+// - pickup axe [done]
+// - pickup wood
+// - pickup iron
+// - craft axe
 
-// - simple find path
-// - if no path take some action
-// - find path again
+pub struct State {
+    pub path: Option<Vec<(u32, u32)>>,
+    pub cost: Option<f32>,
+    pub actions: VecDeque<Box<dyn Action>>,
+    pub destination_reached: bool,
+}
 
-// path hero object or state to pathfinding
+pub trait Action {
+    fn is_available(&self, params: &PathfindingParams) -> bool;
+    fn exec(&self, params: &mut PathfindingParams, state: &mut State);
+}
+pub struct FindPathAction {}
+pub struct PickupAxeAction {}
+
+impl Action for FindPathAction {
+    fn is_available(&self, params: &PathfindingParams) -> bool {
+        true
+    }
+
+    fn exec(&self, params: &mut PathfindingParams, state: &mut State) {
+        let path = find_path(params);
+
+        if path.is_some() {
+            state.destination_reached = true;
+            if let Some(ref mut prev_path) = state.path {
+                prev_path.append(&mut path.unwrap());
+            } else {
+                state.path = path;
+            }
+        } else {
+            if !params.graph_node_types.contains(&GraphNodeType::Tree) {
+                state.actions.push_back(Box::new(PickupAxeAction {}));
+            }
+        }
+    }
+}
+
+impl Action for PickupAxeAction {
+    fn is_available(&self, params: &PathfindingParams) -> bool {
+        true
+    }
+
+    fn exec(&self, params: &mut PathfindingParams, state: &mut State) {
+        println!("PickupAxeAction");
+
+        println!("{:?}", params.end_node);
+        let final_destination = params.end_node;
+
+        params.end_node = params.axe_position;
+
+        let path_to_axe = find_path(params);
+
+        if path_to_axe.is_some() {
+            params.start_node = params.axe_position;
+            params.end_node = final_destination;
+
+            if let Some(ref mut path) = state.path {
+                path.append(&mut path_to_axe.unwrap());
+            } else {
+                state.path = path_to_axe;
+            }
+
+            state.actions.push_back(Box::new(FindPathAction {}));
+            params.graph_node_types.push(GraphNodeType::Tree);
+        }
+    }
+}
+
+pub fn plan_path(mut params: PathfindingParams) -> Option<Vec<(u32, u32)>> {
+    let mut state = State {
+        path: None,
+        cost: None,
+        actions: VecDeque::new(),
+        destination_reached: false,
+    };
+    state.actions.push_front(Box::new(FindPathAction {}));
+
+    while let Some(action) = state.actions.pop_front() {
+        action.exec(&mut params, &mut state);
+
+        if state.destination_reached {
+            state.actions.clear();
+            return state.path;
+        }
+    }
+
+    None
+}
 
 // (col, row)
-pub fn find_path(
-    params: PathfindingParams
-) -> Option<Vec<(u32, u32)>> {
+pub fn find_path(params: &mut PathfindingParams) -> Option<Vec<(u32, u32)>> {
     let mut open_set: Vec<(u32, u32)> = vec![];
     open_set.push(*params.start_node);
 
@@ -60,18 +148,15 @@ pub fn find_path(
         };
 
         for neighbor in connections.iter() {
-            let neighbor_node = params.game_grid_nodes
-                .iter()
-                .find(|node| {
-                    (node.col == neighbor.0 && node.row == neighbor.1)
-                        && params.graph_node_types.contains(&node.node_type)
-                });
-            if neighbor_node.is_none()
-            {
+            let neighbor_node = params.game_grid_nodes.iter().find(|node| {
+                (node.col == neighbor.0 && node.row == neighbor.1)
+                    && params.graph_node_types.contains(&node.node_type)
+            });
+            if neighbor_node.is_none() {
                 continue;
             };
 
-            let pathing_cost = PATHING_COST[&neighbor_node.unwrap().node_type];            
+            let pathing_cost = PATHING_COST[&neighbor_node.unwrap().node_type];
 
             let tentative_g_score = g_score.get(&current).unwrap() + pathing_cost;
             if &tentative_g_score < g_score.get(&neighbor).unwrap_or(&f32::INFINITY) {
