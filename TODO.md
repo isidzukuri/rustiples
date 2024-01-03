@@ -1,14 +1,12 @@
 - unit tests
-- split grid components into standalone files
 - wrap blocked grid cells into images. Mountains, rivers, trees, etc...
 - add some audio
 - write smtn with state
-- use events for smtn
 - detect lines for rivers
 - generate obstacles on the grid: lines for rivers, cellgroups for mountaiins and ponds
 - add animated sprites
 - castle screen: enter castle, screen building
 - map state save
 - render castle on grid. create special castle cells and group them behind sprite. ckick on any should open castle screen.
-- combine maze and czstle in grid generation
-- pathfinding thru obstacles with decision making. If there is a path - just go. If there is a trees and u have an axe - chop and go. Dont have an axe - fsnd one, chop and go. Every action should increase a price for this node to path and its should be taken into acount when in pathfinding algorithm
+- combine maze and castle in grid generation
+- pathfinding thru obstacles with decision making. If there is a path - just go. If there is a trees and u have an axe - chop and go. Dont have an axe - find one, chop and go. Every action should increase a cost for this node to path and its should be taken into acount in pathfinding algorithm

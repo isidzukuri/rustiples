@@ -1,9 +1,18 @@
 use crate::game_grid::graph_node::*;
-use crate::game_grid::hero::Hero;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 
-use crate::game_grid::pathfinding_params::*;
+pub mod action;
+pub mod find_path_action;
+pub mod pathfinding_params;
+pub mod pickup_axe_action;
+pub mod state;
+
+use crate::game_grid::ai::action::*;
+use crate::game_grid::ai::find_path_action::*;
+use crate::game_grid::ai::pathfinding_params::*;
+use crate::game_grid::ai::pickup_axe_action::*;
+use crate::game_grid::ai::state::*;
 
 // actions:
 // - find path [done]
@@ -11,71 +20,6 @@ use crate::game_grid::pathfinding_params::*;
 // - pickup wood
 // - pickup iron
 // - craft axe
-
-pub struct State {
-    pub path: Option<Vec<(u32, u32)>>,
-    pub cost: Option<f32>,
-    pub actions: VecDeque<Box<dyn Action>>,
-    pub destination_reached: bool,
-}
-
-pub trait Action {
-    fn is_available(&self, params: &PathfindingParams) -> bool; //TODO: decouple actions with this
-    fn exec(&self, params: &mut PathfindingParams, state: &mut State);
-}
-pub struct FindPathAction {}
-pub struct PickupAxeAction {}
-
-impl Action for FindPathAction {
-    fn is_available(&self, params: &PathfindingParams) -> bool {
-        true
-    }
-
-    fn exec(&self, params: &mut PathfindingParams, state: &mut State) {
-        let path = find_path(params);
-
-        if path.is_some() {
-            state.destination_reached = true;
-            if let Some(ref mut prev_path) = state.path {
-                prev_path.append(&mut path.unwrap());
-            } else {
-                state.path = path;
-            }
-        } else {
-            if !params.graph_node_types.contains(&GraphNodeType::Tree) {
-                state.actions.push_back(Box::new(PickupAxeAction {}));
-            }
-        }
-    }
-}
-
-impl Action for PickupAxeAction {
-    fn is_available(&self, params: &PathfindingParams) -> bool {
-        true
-    }
-
-    fn exec(&self, params: &mut PathfindingParams, state: &mut State) {
-        let final_destination = params.end_node;
-
-        params.end_node = params.axe_position;
-
-        let path_to_axe = find_path(params);
-
-        if path_to_axe.is_some() {
-            params.start_node = params.axe_position;
-            params.end_node = final_destination;
-
-            if let Some(ref mut path) = state.path {
-                path.append(&mut path_to_axe.unwrap());
-            } else {
-                state.path = path_to_axe;
-            }
-
-            state.actions.push_back(Box::new(FindPathAction {}));
-            params.graph_node_types.push(GraphNodeType::Tree);
-        }
-    }
-}
 
 pub fn plan_path(mut params: PathfindingParams) -> Option<Vec<(u32, u32)>> {
     let mut state = State {

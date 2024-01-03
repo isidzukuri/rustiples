@@ -1,12 +1,12 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
+use crate::game_grid::ai::pathfinding_params::*;
 pub use crate::game_grid::ai::*;
 pub use crate::game_grid::game_buttons::*;
 pub use crate::game_grid::generators::generate_grid;
 pub use crate::game_grid::generators::*;
 pub use crate::game_grid::graph_node::*;
-use crate::game_grid::pathfinding_params::*;
 
 pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
