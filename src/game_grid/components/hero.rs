@@ -4,6 +4,7 @@ use bevy::prelude::*;
 #[derive(Component, Debug)]
 pub struct Hero {
     pub world_position: WorldPosition,
+    pub has_axe: bool
 }
 
 impl Hero {

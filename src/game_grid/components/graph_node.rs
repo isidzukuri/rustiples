@@ -1,6 +1,19 @@
 use bevy::prelude::*;
+use std::collections::HashMap;
 
-#[derive(Debug, PartialEq)]
+use lazy_static::lazy_static;
+
+lazy_static! {
+    pub static ref PATHING_COST: HashMap<GraphNodeType, f32> = {
+        HashMap::from([
+                (GraphNodeType::RouteHead, 1.0),
+                (GraphNodeType::Standard, 1.0),
+                (GraphNodeType::Tree, 4.0),
+            ])
+    };
+}
+
+#[derive(Debug, Eq, PartialEq, Hash)]
 pub enum GraphNodeType {
     Standard,
     Blocked,

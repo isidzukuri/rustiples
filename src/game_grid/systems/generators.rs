@@ -114,6 +114,7 @@ pub fn generate_grid(
     for position in heroes_positions {
         let obj = Hero {
             world_position: position.clone(),
+            has_axe: true
         };
         spawn_sprite(&mut commands, &asset_server, obj, position, Hero::SPRITE)
     }
@@ -216,11 +217,7 @@ pub fn allocate_trees(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldP
         &Tree::SPRITE_HEIGHT,
         &&GRID_CELL_WIDTH,
         &Tree::MARGIN,
-    )
-    
-    
-    
-    ]
+    )]
 }
 
 pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {

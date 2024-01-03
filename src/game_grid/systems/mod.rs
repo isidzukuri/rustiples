@@ -10,6 +10,8 @@ pub use crate::game_grid::game_buttons::*;
 pub use crate::game_grid::generators::generate_grid;
 pub use crate::game_grid::generators::*;
 pub use crate::game_grid::graph_node::*;
+use crate::game_grid::pathfinding_params::*;
+
 
 pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
@@ -27,11 +29,22 @@ pub fn grid_click(
             let hero_positions = find_positions_by_type(&game_grid_nodes, GraphNodeType::Hero);
             println!("hero at: {:?}", hero_positions);
 
-            let path = find_path(
-                &hero_positions[0],
-                &(col_index, row_index),
-                &game_grid_nodes.iter().map(|(_, node)| node).collect(),
-            );
+            let mut graph_node_types = vec![GraphNodeType::Standard, GraphNodeType::RouteHead];
+
+            // if let Some(hero) = hero_option {
+            //     if hero.has_axe == true {
+            //         graph_node_types.push(GraphNodeType::Tree)
+            //     }
+            // }
+
+            let pathfinding_params = PathfindingParams{
+                start_node: &hero_positions[0],
+                end_node: &(col_index, row_index),
+                game_grid_nodes: &game_grid_nodes.iter().map(|(_, node)| node).collect(),
+                graph_node_types: graph_node_types
+            };
+
+            let path = find_path(pathfinding_params);
             match path {
                 None => { println!("There is no way")}
                 // None => { print_world_info(commands, "There is no path!!!".to_string()) },
@@ -67,29 +80,30 @@ pub fn grid_click(
 
             let route_heads = find_positions_by_type(&game_grid_nodes, GraphNodeType::RouteHead);
 
-            if route_heads.len() > 1 {
-                let path = find_path(
-                    &route_heads[0],
-                    &route_heads[1],
-                    &game_grid_nodes.iter().map(|(_, node)| node).collect(),
-                );
-                match path {
-                    None => {}
-                    // None => { print_world_info(commands, "There is no path!!!".to_string()) },
-                    Some(nodes) => {
-                        for path_node in nodes.iter() {
-                            if let Some((mut sprite, mut node)) =
-                                game_grid_nodes.iter_mut().find(|(_, ref node)| {
-                                    node.col == path_node.0 && node.row == path_node.1
-                                })
-                            {
-                                sprite.color = Color::PURPLE;
-                                node.node_type = GraphNodeType::RoutePoint;
-                            };
-                        }
-                    }
-                }
-            }
+            // if route_heads.len() > 1 {
+            //     let path = find_path(
+            //         &route_heads[0],
+            //         &route_heads[1],
+            //         &game_grid_nodes.iter().map(|(_, node)| node).collect(),
+            //         None
+            //     );
+            //     match path {
+            //         None => {}
+            //         // None => { print_world_info(commands, "There is no path!!!".to_string()) },
+            //         Some(nodes) => {
+            //             for path_node in nodes.iter() {
+            //                 if let Some((mut sprite, mut node)) =
+            //                     game_grid_nodes.iter_mut().find(|(_, ref node)| {
+            //                         node.col == path_node.0 && node.row == path_node.1
+            //                     })
+            //                 {
+            //                     sprite.color = Color::PURPLE;
+            //                     node.node_type = GraphNodeType::RoutePoint;
+            //                 };
+            //             }
+            //         }
+            //     }
+            // }
         }
     }
 
@@ -142,4 +156,18 @@ pub fn grid_click(
         }
         result
     }
+
+    // pub fn find_node_by_position(
+    //     mut game_grid_nodes: &Query<(&mut Sprite, &mut GraphNode), With<GraphNode>>,
+    //     node_type: GraphNodeType,
+    // ) -> Vec<(u32, u32)> {
+    //     // let mut result = vec![];
+    //     // for (_, node) in game_grid_nodes.iter() {
+    //     //     if node.node_type == node_type {
+    //     //         result.push((node.col, node.row));
+    //     //     }
+    //     // }
+    //     // result
+    // }
+    
 }
