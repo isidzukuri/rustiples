@@ -7,6 +7,8 @@ pub use crate::game_grid::game_buttons::*;
 pub use crate::game_grid::generators::generate_grid;
 pub use crate::game_grid::generators::*;
 pub use crate::game_grid::graph_node::*;
+pub use crate::game_grid::position::*;
+// use crate::game_grid::world_position::WorldPosition;
 
 pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
@@ -27,6 +29,7 @@ pub fn grid_click(
                 GraphNodeType::Standard,
                 GraphNodeType::RouteHead,
                 GraphNodeType::Axe,
+                GraphNodeType::Mineral,
             ];
 
             let pathfinding_params = PathfindingParams {
@@ -134,7 +137,7 @@ pub fn grid_click(
             let col_index = ((position.x) / GRID_CELL_WIDTH).floor() as u32;
             let row_index = ((position.y) / GRID_CELL_WIDTH).floor() as u32;
 
-            println!("{}, {}", row_index, col_index);
+            println!("{}, {}", col_index, row_index);
 
             Some((col_index, row_index))
         } else {
