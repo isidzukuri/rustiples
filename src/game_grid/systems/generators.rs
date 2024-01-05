@@ -35,7 +35,7 @@ pub fn generate_grid(
         allocate_heroes(&width_in_cells, &height_in_cells, &mut position_allocator);
     let axes_positions = allocate_axes(&width_in_cells, &height_in_cells, &mut position_allocator);
     let castle_positions = allocate_positions(
-        1,
+        2,
         &width_in_cells,
         &height_in_cells,
         Castle::world_position_params(),
@@ -93,6 +93,7 @@ pub fn generate_grid(
             SpriteBundle {
                 sprite: Sprite {
                     color: if is_castle {
+                        // Color::GRAY
                         Color::GOLD
                     } else if is_hero {
                         Color::ANTIQUE_WHITE
