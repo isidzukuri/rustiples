@@ -199,78 +199,75 @@ pub fn allocate_positions(
 
     let mut positions = vec![];
     while positions.len() < quantity {
-        let mut object_position = WorldPosition::alocate_new_position(
-            &sprite_width,
-            &sprite_height,
-            width_in_cells,
-            height_in_cells,
-            &GRID_CELL_WIDTH,
-            &margin,
-        );
         let mut generations_count = 0;
+        let mut intersects = true;
 
-        while positions
-            .iter()
-            .any(|position| object_position.intersects_with(position))
-        {
-            object_position = WorldPosition::alocate_new_position(
+        while intersects {
+            let object_position = WorldPosition::alocate_new_position(
                 &sprite_width,
                 &sprite_height,
-                &width_in_cells,
-                &height_in_cells,
-                &&GRID_CELL_WIDTH,
+                width_in_cells,
+                height_in_cells,
+                &GRID_CELL_WIDTH,
                 &margin,
             );
+
+            intersects = positions
+                .iter()
+                .any(|position| object_position.intersects_with(position));
+            if !intersects {
+                positions.push(object_position);
+            }
+
             generations_count += 1;
             if generations_count == 100 {
                 panic!("world is to small to fit all objects")
             }
         }
-        positions.push(object_position);
     }
     positions
 }
-pub fn allocate_trees(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
-    vec![
-        WorldPosition::alocate_at(
-            &10,
-            &0,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-        WorldPosition::alocate_at(
-            &10,
-            &1,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-        WorldPosition::alocate_at(
-            &11,
-            &1,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-        WorldPosition::alocate_at(
-            &12,
-            &1,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-        WorldPosition::alocate_at(
-            &12,
-            &0,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-    ]
-}
+// pub fn allocate_trees(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+//     vec![
+//         WorldPosition::alocate_at(
+//             &10,
+//             &0,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//         WorldPosition::alocate_at(
+//             &10,
+//             &1,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//         WorldPosition::alocate_at(
+//             &11,
+//             &1,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//         WorldPosition::alocate_at(
+//             &12,
+//             &1,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//         WorldPosition::alocate_at(
+//             &12,
+//             &0,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//     ]
+// }

@@ -13,3 +13,4 @@
 - spread resources piles onto the map. Perform tactical analysis(influence mapping, convolution filter)
 - write bot which will be performing actions to win the game after some triger. Make him perform one action per second< for example.
 - fix world generation: register already used  nodes
+- build lumber mil action
