@@ -24,6 +24,7 @@ pub enum GraphNodeType {
     Tree,
     Axe,
     Hero,
+    Mineral
 }
 
 #[derive(Component, Debug)]

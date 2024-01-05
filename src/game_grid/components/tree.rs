@@ -1,4 +1,4 @@
-use super::world_position::WorldPosition;
+use super::world_position::*;
 use bevy::prelude::*;
 
 #[derive(Component, Debug)]
@@ -11,4 +11,10 @@ impl Tree {
     pub const SPRITE_WIDTH: f32 = 50.0f32;
     pub const SPRITE_HEIGHT: f32 = 50.0f32;
     pub const SPRITE: &str = "sprites/tree.png";
+}
+
+impl WorldPositionParams for Tree {
+    fn world_position_params() -> (f32, f32, (u32, u32, u32, u32)){
+        (Self::SPRITE_WIDTH, Self::SPRITE_HEIGHT, Self::MARGIN)
+    } 
 }

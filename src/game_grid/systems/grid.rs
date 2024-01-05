@@ -27,6 +27,7 @@ pub fn grid_click(
                 GraphNodeType::Standard,
                 GraphNodeType::RouteHead,
                 GraphNodeType::Axe,
+                GraphNodeType::Mineral,
             ];
 
             let pathfinding_params = PathfindingParams {

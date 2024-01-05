@@ -9,7 +9,7 @@ use crate::game_grid::graph_node::GraphNodeType;
 use crate::game_grid::graph_node::*;
 use crate::game_grid::hero::Hero;
 use crate::game_grid::tree::Tree;
-use crate::game_grid::world_position::WorldPosition;
+use crate::game_grid::world_position::{WorldPosition, WorldPositionParams};
 
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
@@ -27,10 +27,11 @@ pub fn generate_grid(
     let mut col_index = 0u32;
     let mut row_index = 0u32;
 
-    let castle_positions = allocate_castles(&width_in_cells, &height_in_cells);
+    let castle_positions = allocate_positions(2, &width_in_cells, &height_in_cells, Castle::world_position_params());
     let heroes_positions = allocate_heroes(&width_in_cells, &height_in_cells);
     let axes_positions = allocate_axes(&width_in_cells, &height_in_cells);
-    let trees_positions = allocate_trees(&width_in_cells, &height_in_cells);
+    let trees_positions = allocate_positions(15, &width_in_cells, &height_in_cells, Tree::world_position_params());
+    // let trees_positions = allocate_trees(&width_in_cells, &height_in_cells);
     loop {
         if row_index == height_in_cells && col_index == 0 {
             break;
@@ -177,82 +178,84 @@ pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPo
         &Axe::MARGIN,
     )]
 }
-pub fn allocate_trees(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
-    vec![
-        WorldPosition::alocate_at(
-            &10,
-            &0,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-        WorldPosition::alocate_at(
-            &10,
-            &1,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-        WorldPosition::alocate_at(
-            &11,
-            &1,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-        WorldPosition::alocate_at(
-            &12,
-            &1,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-        WorldPosition::alocate_at(
-            &12,
-            &0,
-            &Tree::SPRITE_WIDTH,
-            &Tree::SPRITE_HEIGHT,
-            &&GRID_CELL_WIDTH,
-            &Tree::MARGIN,
-        ),
-    ]
-}
 
-pub fn allocate_castles(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
-    let mut castle_positions = vec![];
-    let mut generations_count = 0;
-    for _num in 0..2 {
-        let mut castle_position = WorldPosition::alocate_new_position(
-            &Castle::SPRITE_WIDTH,
-            &Castle::SPRITE_HEIGHT,
+pub fn allocate_positions(quantity: usize, width_in_cells: &u32, height_in_cells: &u32, position_params: (f32, f32, (u32, u32, u32, u32)) ) -> Vec<WorldPosition> {
+    let (sprite_width, sprite_height, margin) = position_params;
+   
+    let mut positions = vec![];
+    while positions.len() < quantity {
+        let mut object_position = WorldPosition::alocate_new_position(
+            &sprite_width,
+            &sprite_height,
             width_in_cells,
             height_in_cells,
             &GRID_CELL_WIDTH,
-            &Castle::MARGIN,
+            &margin,
         );
+        let mut generations_count = 0;
 
-        while castle_positions
+        while positions
             .iter()
-            .any(|position| castle_position.intersects_with(position))
+            .any(|position| object_position.intersects_with(position))
         {
-            castle_position = WorldPosition::alocate_new_position(
-                &Castle::SPRITE_WIDTH,
-                &Castle::SPRITE_HEIGHT,
+            object_position = WorldPosition::alocate_new_position(
+                &sprite_width,
+                &sprite_height,
                 &width_in_cells,
                 &height_in_cells,
                 &&GRID_CELL_WIDTH,
-                &Castle::MARGIN,
+                &margin,
             );
             generations_count += 1;
-            if generations_count == 25 {
-                panic!("world is to small to fit all castles")
+            if generations_count == 100 {
+                panic!("world is to small to fit all objects")
             }
         }
-        castle_positions.push(castle_position);
+        positions.push(object_position);
     }
-    castle_positions
+    positions
 }
+// pub fn allocate_trees(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+//     vec![
+//         WorldPosition::alocate_at(
+//             &10,
+//             &0,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//         WorldPosition::alocate_at(
+//             &10,
+//             &1,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//         WorldPosition::alocate_at(
+//             &11,
+//             &1,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//         WorldPosition::alocate_at(
+//             &12,
+//             &1,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//         WorldPosition::alocate_at(
+//             &12,
+//             &0,
+//             &Tree::SPRITE_WIDTH,
+//             &Tree::SPRITE_HEIGHT,
+//             &&GRID_CELL_WIDTH,
+//             &Tree::MARGIN,
+//         ),
+//     ]
+// }
