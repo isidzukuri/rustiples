@@ -135,7 +135,7 @@ pub fn grid_click(
             let col_index = ((position.x) / GRID_CELL_WIDTH).floor() as u32;
             let row_index = ((position.y) / GRID_CELL_WIDTH).floor() as u32;
 
-            println!("{}, {}", row_index, col_index);
+            println!("{}, {}", col_index, row_index);
 
             Some((col_index, row_index))
         } else {

@@ -14,7 +14,7 @@ impl Tree {
 }
 
 impl WorldPositionParams for Tree {
-    fn world_position_params() -> (f32, f32, (u32, u32, u32, u32)){
+    fn world_position_params() -> (f32, f32, (u32, u32, u32, u32)) {
         (Self::SPRITE_WIDTH, Self::SPRITE_HEIGHT, Self::MARGIN)
-    } 
+    }
 }
