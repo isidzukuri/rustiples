@@ -1,9 +1,6 @@
-use bevy::prelude::*;
-use rand::Rng;
+use super::position_alocator::*;
 
-use crate::game_grid::systems::PositionAllocator;
-
-#[derive(Component, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub struct WorldPosition {
     pub width_px: f32,
     pub height_px: f32,
@@ -27,38 +24,6 @@ impl WorldPosition {
         } else {
             false
         }
-    }
-
-    pub fn intersects_with(&self, other: &Self) -> bool {
-        if (((self.from_x_cell_with_margin() <= other.to_x_cell_with_margin()
-            && self.to_x_cell_with_margin() >= other.from_x_cell_with_margin())
-            || (self.from_x_cell_with_margin() >= other.to_x_cell_with_margin()
-                && self.to_x_cell_with_margin() <= other.from_x_cell_with_margin()))
-            && (self.from_y_cell_with_margin() >= other.to_y_cell_with_margin()
-                && self.to_y_cell_with_margin() <= other.from_y_cell_with_margin())
-            || self.from_y_cell_with_margin() <= other.to_y_cell_with_margin()
-                && self.to_y_cell_with_margin() >= other.from_y_cell_with_margin())
-        {
-            true
-        } else {
-            false
-        }
-    }
-
-    fn from_x_cell_with_margin(&self) -> u32 {
-        self.from_x_cell - self.margin.3
-    }
-
-    fn to_x_cell_with_margin(&self) -> u32 {
-        self.to_x_cell + self.margin.1
-    }
-
-    fn from_y_cell_with_margin(&self) -> u32 {
-        self.from_y_cell - self.margin.2
-    }
-
-    fn to_y_cell_with_margin(&self) -> u32 {
-        self.to_y_cell + self.margin.0
     }
 
     pub fn alocate_new_position(

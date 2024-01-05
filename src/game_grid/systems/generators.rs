@@ -11,7 +11,8 @@ use crate::game_grid::hero::Hero;
 use crate::game_grid::tree::Tree;
 use crate::game_grid::world_position::{WorldPosition, WorldPositionParams};
 
-use super::PositionAllocator;
+use crate::game_grid::position_alocator::PositionAllocator;
+// use super::PositionAllocator;
 
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
@@ -43,7 +44,7 @@ pub fn generate_grid(
         &mut position_allocator,
     );
     let trees_positions = allocate_positions(
-        20,
+        200,
         &width_in_cells,
         &height_in_cells,
         Tree::world_position_params(),

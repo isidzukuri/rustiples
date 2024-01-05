@@ -1,4 +1,5 @@
-use super::world_position::*;
+use crate::game_grid::WorldPosition;
+use crate::game_grid::WorldPositionParams;
 use bevy::prelude::*;
 
 #[derive(Component, Debug)]
