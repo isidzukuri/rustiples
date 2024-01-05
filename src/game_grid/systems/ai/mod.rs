@@ -136,3 +136,56 @@ pub fn reconstruct_path(
 
     total_path
 }
+
+pub fn find_position_amid(
+    params: &PathfindingParams,
+    node_type: GraphNodeType,
+) -> Option<(u32, u32)> {
+    let mut node_rates: Vec<((u32, u32), f32)> = vec![];
+
+    for node in params.game_grid_nodes.iter() {
+        let convolution_window = convolution_window_nodes((node.col, node.row), 2);
+        let rate = params
+            .game_grid_nodes
+            .iter()
+            .filter(|grid_node| {
+                grid_node.node_type == node_type
+                    && convolution_window.contains(&(grid_node.col, grid_node.row))
+            })
+            .count();
+
+        node_rates.push(((node.col, node.row), (rate as f32)));
+    }
+
+    match node_rates.iter().max_by(|a, b| a.1.total_cmp(&b.1)) {
+        Some(rate) => return Some(rate.0),
+        None => return None,
+    }
+}
+
+pub fn convolution_window_nodes(node: (u32, u32), size: u32) -> Vec<(u32, u32)> {
+    let mut nodes: Vec<(u32, u32)> = vec![node];
+    let mut shift = 1;
+
+    while shift <= size {
+        nodes.push((node.0 + shift, node.1));
+        nodes.push((node.0, node.1 + shift));
+        nodes.push((node.0 + shift, node.1 + shift));
+
+        if (node.1 as i32 - shift as i32) > 0 {
+            nodes.push((node.0, node.1 - shift));
+            nodes.push((node.0 + shift, node.1 - shift));
+        };
+        if (node.0 as i32 - shift as i32) > 0 {
+            nodes.push((node.0 - shift, node.1));
+            nodes.push((node.0 - shift, node.1 + shift));
+        };
+        if (node.1 as i32 - shift as i32) > 0 && (node.0 as i32 - shift as i32) > 0 {
+            nodes.push((node.0 - shift, node.1 - shift));
+        }
+
+        shift += 1;
+    }
+
+    nodes
+}
