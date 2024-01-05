@@ -50,7 +50,6 @@ impl WorldPosition {
                 height_px: *sprite_height,
                 width_cells: width_cells,
                 height_cells: height_cells,
-
                 from_x_cell: allocation.from_x_cell + margin.3,
                 from_y_cell: allocation.from_y_cell + margin.2,
                 to_x_cell: allocation.to_x_cell - margin.1,

@@ -1,4 +1,3 @@
-
 use rand::prelude::SliceRandom;
 #[derive(Copy, Clone, Debug)]
 pub struct PositionAllocation {
@@ -10,7 +9,7 @@ pub struct PositionAllocation {
 pub struct PositionAllocator {
     pub width_cells: u32,
     pub height_cells: u32,
-    pub reserved_cells: Vec<(u32, u32)>, // pub reserved_positions: Vec<WorldPosition>
+    pub reserved_cells: Vec<(u32, u32)>,
 }
 
 impl PositionAllocator {
@@ -39,7 +38,10 @@ impl PositionAllocator {
 
                 for cur_col_index in col_index..(col_index + width_cells) {
                     for cur_row_index in row_index..(row_index + height_cells) {
-                        if self.reserved_cells.contains(&(cur_col_index, cur_row_index)) {
+                        if self
+                            .reserved_cells
+                            .contains(&(cur_col_index, cur_row_index))
+                        {
                             allocated = false;
                             break;
                         }

@@ -1,18 +1,16 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 use rand::Rng;
-use std::collections::HashMap;
 
 use crate::game_grid::axe::Axe;
 use crate::game_grid::castle::Castle;
 use crate::game_grid::graph_node::GraphNodeType;
 use crate::game_grid::graph_node::*;
 use crate::game_grid::hero::Hero;
+use crate::game_grid::mountain::Mountain;
 use crate::game_grid::tree::Tree;
 use crate::game_grid::world_position::{WorldPosition, WorldPositionParams};
-
 use crate::game_grid::position_alocator::PositionAllocator;
-// use super::PositionAllocator;
 
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
@@ -44,10 +42,17 @@ pub fn generate_grid(
         &mut position_allocator,
     );
     let trees_positions = allocate_positions(
-        200,
+        20,
         &width_in_cells,
         &height_in_cells,
         Tree::world_position_params(),
+        &mut position_allocator,
+    );
+    let mountains_positions = allocate_positions(
+        20,
+        &width_in_cells,
+        &height_in_cells,
+        Mountain::world_position_params(),
         &mut position_allocator,
     );
     // let trees_positions = allocate_trees(&width_in_cells, &height_in_cells);
@@ -62,7 +67,7 @@ pub fn generate_grid(
         let x = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * col_index as f32;
         let y = HALF_GRID_CELL_WIDTH + GRID_CELL_WIDTH * row_index as f32;
 
-        let random_num: u16 = rand::thread_rng().gen_range(1..50);
+        let random_num: u16 = rand::thread_rng().gen_range(1..50000);
 
         let is_castle = castle_positions
             .iter()
@@ -77,6 +82,10 @@ pub fn generate_grid(
             .any(|position| position.is_owned_cell(&col_index, &row_index));
 
         let is_tree = trees_positions
+            .iter()
+            .any(|position| position.is_owned_cell(&col_index, &row_index));
+
+        let is_mountain = mountains_positions
             .iter()
             .any(|position| position.is_owned_cell(&col_index, &row_index));
 
@@ -113,6 +122,8 @@ pub fn generate_grid(
                     GraphNodeType::Axe
                 } else if is_tree {
                     GraphNodeType::Tree
+                } else if is_mountain {
+                    GraphNodeType::Mountain
                 } else if random_num == 1 {
                     GraphNodeType::Blocked
                 } else {
@@ -152,6 +163,18 @@ pub fn generate_grid(
             world_position: position.clone(),
         };
         spawn_sprite(&mut commands, &asset_server, obj, position, Tree::SPRITE)
+    }
+    for position in mountains_positions {
+        let obj = Tree {
+            world_position: position.clone(),
+        };
+        spawn_sprite(
+            &mut commands,
+            &asset_server,
+            obj,
+            position,
+            Mountain::SPRITE,
+        )
     }
 }
 
