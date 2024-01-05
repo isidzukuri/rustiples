@@ -11,6 +11,8 @@ use crate::game_grid::hero::Hero;
 use crate::game_grid::tree::Tree;
 use crate::game_grid::world_position::{WorldPosition, WorldPositionParams};
 
+use super::PositionAllocator;
+
 pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
 pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
 
@@ -24,24 +26,33 @@ pub fn generate_grid(
     let width_in_cells = (window.width() / GRID_CELL_WIDTH) as u32;
     let height_in_cells = (window.height() / GRID_CELL_WIDTH) as u32;
 
-    let mut col_index = 0u32;
-    let mut row_index = 0u32;
+    let mut position_allocator = PositionAllocator {
+        width_cells: width_in_cells,
+        height_cells: height_in_cells,
+        reserved_cells: vec![],
+    };
 
+    let heroes_positions =
+        allocate_heroes(&width_in_cells, &height_in_cells, &mut position_allocator);
+    let axes_positions = allocate_axes(&width_in_cells, &height_in_cells, &mut position_allocator);
     let castle_positions = allocate_positions(
         1,
         &width_in_cells,
         &height_in_cells,
         Castle::world_position_params(),
+        &mut position_allocator,
     );
-    let heroes_positions = allocate_heroes(&width_in_cells, &height_in_cells);
-    let axes_positions = allocate_axes(&width_in_cells, &height_in_cells);
     let trees_positions = allocate_positions(
-        19,
+        20,
         &width_in_cells,
         &height_in_cells,
         Tree::world_position_params(),
+        &mut position_allocator,
     );
     // let trees_positions = allocate_trees(&width_in_cells, &height_in_cells);
+
+    let mut col_index = 0u32;
+    let mut row_index = 0u32;
     loop {
         if row_index == height_in_cells && col_index == 0 {
             break;
@@ -167,7 +178,11 @@ pub fn spawn_sprite<T>(
     ));
 }
 
-pub fn allocate_heroes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+pub fn allocate_heroes(
+    width_in_cells: &u32,
+    height_in_cells: &u32,
+    position_allocator: &mut PositionAllocator,
+) -> Vec<WorldPosition> {
     vec![WorldPosition::alocate_at(
         &0,
         &0,
@@ -175,10 +190,15 @@ pub fn allocate_heroes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<World
         &Hero::SPRITE_HEIGHT,
         &&GRID_CELL_WIDTH,
         &Hero::MARGIN,
+        position_allocator,
     )]
 }
 
-pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPosition> {
+pub fn allocate_axes(
+    width_in_cells: &u32,
+    height_in_cells: &u32,
+    position_allocator: &mut PositionAllocator,
+) -> Vec<WorldPosition> {
     vec![WorldPosition::alocate_at(
         &1,
         &12,
@@ -186,6 +206,7 @@ pub fn allocate_axes(width_in_cells: &u32, height_in_cells: &u32) -> Vec<WorldPo
         &Axe::SPRITE_HEIGHT,
         &&GRID_CELL_WIDTH,
         &Axe::MARGIN,
+        position_allocator,
     )]
 }
 
@@ -194,36 +215,21 @@ pub fn allocate_positions(
     width_in_cells: &u32,
     height_in_cells: &u32,
     position_params: (f32, f32, (u32, u32, u32, u32)),
+    position_allocator: &mut PositionAllocator,
 ) -> Vec<WorldPosition> {
     let (sprite_width, sprite_height, margin) = position_params;
 
     let mut positions = vec![];
     while positions.len() < quantity {
-        let mut generations_count = 0;
-        let mut intersects = true;
-
-        while intersects {
-            let object_position = WorldPosition::alocate_new_position(
-                &sprite_width,
-                &sprite_height,
-                width_in_cells,
-                height_in_cells,
-                &GRID_CELL_WIDTH,
-                &margin,
-            );
-
-            intersects = positions
-                .iter()
-                .any(|position| object_position.intersects_with(position));
-            if !intersects {
-                positions.push(object_position);
-            }
-
-            generations_count += 1;
-            if generations_count == 100 {
-                panic!("world is to small to fit all objects")
-            }
-        }
+        positions.push(WorldPosition::alocate_new_position(
+            &sprite_width,
+            &sprite_height,
+            width_in_cells,
+            height_in_cells,
+            &GRID_CELL_WIDTH,
+            &margin,
+            position_allocator,
+        ));
     }
     positions
 }

@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use rand::Rng;
 
+use crate::game_grid::systems::PositionAllocator;
+
 #[derive(Component, Debug, Clone)]
 pub struct WorldPosition {
     pub width_px: f32,
@@ -66,26 +68,30 @@ impl WorldPosition {
         window_height_in_cells: &u32,
         cell_size: &f32,
         margin: &(u32, u32, u32, u32), // clockwise from 12
+        position_allocator: &mut PositionAllocator,
     ) -> Self {
-        let width_in_cells = (sprite_width / cell_size).ceil() as u32;
-        let height_in_cells = (sprite_height / cell_size).ceil() as u32;
+        let width_cells = (sprite_width / cell_size).ceil() as u32;
+        let height_cells = (sprite_height / cell_size).ceil() as u32;
 
-        let max_x_cell = window_width_in_cells - width_in_cells - margin.1;
-        let max_y_cell = window_height_in_cells - height_in_cells - margin.0;
+        let width_cells_with_box = width_cells + margin.1 + margin.3;
+        let height_cells_with_box = height_cells + margin.0 + margin.2;
 
-        let position_x_cell: u32 = rand::thread_rng().gen_range(margin.3..max_x_cell);
-        let position_y_cell: u32 = rand::thread_rng().gen_range(margin.2..max_y_cell);
+        match position_allocator.allocate(width_cells_with_box, height_cells_with_box) {
+            None => {
+                panic!("not possible to allocate space in world for the object")
+            }
+            Some(allocation) => Self {
+                width_px: *sprite_width,
+                height_px: *sprite_height,
+                width_cells: width_cells,
+                height_cells: height_cells,
 
-        Self {
-            width_px: *sprite_width,
-            height_px: *sprite_height,
-            width_cells: width_in_cells,
-            height_cells: height_in_cells,
-            from_x_cell: position_x_cell,
-            from_y_cell: position_y_cell,
-            to_x_cell: position_x_cell + width_in_cells - 1,
-            to_y_cell: position_y_cell + height_in_cells - 1,
-            margin: *margin,
+                from_x_cell: allocation.from_x_cell + margin.3,
+                from_y_cell: allocation.from_y_cell + margin.2,
+                to_x_cell: allocation.to_x_cell - margin.1,
+                to_y_cell: allocation.to_y_cell - margin.0,
+                margin: *margin,
+            },
         }
     }
 
@@ -96,9 +102,12 @@ impl WorldPosition {
         sprite_height: &f32,
         cell_size: &f32,
         margin: &(u32, u32, u32, u32), // clockwise from 12
+        position_allocator: &mut PositionAllocator,
     ) -> Self {
         let width_in_cells = (sprite_width / cell_size).ceil() as u32;
         let height_in_cells = (sprite_height / cell_size).ceil() as u32;
+
+        position_allocator.reserve(*position_x_cell, *position_y_cell);
 
         Self {
             width_px: *sprite_width,
