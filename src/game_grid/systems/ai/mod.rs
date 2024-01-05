@@ -29,7 +29,7 @@ pub fn plan_path(mut params: PathfindingParams) -> Option<Vec<(u32, u32)>> {
         destination_reached: false,
     };
     state.actions.push_front(Box::new(FindPathAction {}));
-
+    
     while let Some(action) = state.actions.pop_front() {
         action.exec(&mut params, &mut state);
 
@@ -144,6 +144,8 @@ pub fn find_position_amid(
     let mut node_rates: Vec<((u32, u32), f32)> = vec![];
 
     for node in params.game_grid_nodes.iter() {
+        if node.node_type != GraphNodeType::Standard { continue; }
+
         let convolution_window = convolution_window_nodes((node.col, node.row), 2);
         let rate = params
             .game_grid_nodes

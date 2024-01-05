@@ -12,4 +12,6 @@
 - pathfinding thru obstacles with decision making. If there is a path - just go. If there is a trees and u have an axe - chop and go. Dont have an axe - find one, chop and go. Every action should increase a cost for this node to path and its should be taken into acount in pathfinding algorithm
 - spread resource piles onto the map. Perform tactical analysis(influence mapping, convolution filter)
 - write bot which will be performing actions to win the game after some triger. Make him perform one action per second< for example.
-- build lumber mil action			
+- build lumber mil action
+- complex flow: place castle behind the water. To path thru water bridge must be built. Must have lumber mill to build bridge. Must have axe to build a mill. Mill must be placed amid heighest density of trees.
+- fix position alocator			
