@@ -1,84 +1,13 @@
 use bevy::prelude::*;
 use uuid::Uuid;
 
+pub use crate::game_grid::entry::*;
+pub use crate::game_grid::grid_entity::*;
+pub use crate::game_grid::grid_entity_config::*;
+pub use crate::game_grid::grid_entity_type::GridEntityType;
+pub use crate::game_grid::grid_node::*;
+pub use crate::game_grid::grid_position::*;
 use crate::game_grid::systems::position_allocator::PositionAllocator;
-
-#[derive(Debug, Eq, PartialEq, Hash, Copy, Clone)]
-pub enum GridEntityType {
-    Castle,
-    Tree,
-    Axe,
-    Hero,
-    Mountain,
-    Water, // Standard,
-           // Blocked,
-           // RouteHead,
-           // RoutePoint,
-           // Mineral,
-}
-
-#[derive(Debug, Clone)]
-pub struct GridEntityConfig {
-    pub sprite: String,
-    pub width_px: f32,
-    pub height_px: f32,
-    pub margin: (u32, u32, u32, u32),
-    pub entity_type: GridEntityType,
-}
-
-#[derive(Component, Debug)]
-pub struct GridEntity {
-    pub id: Uuid,
-    pub entity_type: GridEntityType,
-    pub x_px: f32,
-    pub y_px: f32,
-    pub config: GridEntityConfig,
-}
-
-#[derive(Component, Debug)]
-pub struct GridNode {
-    pub id: Uuid,
-}
-
-impl GridNode {
-    pub fn new() -> Self {
-        Self { id: Uuid::new_v4() }
-    }
-}
-
-pub struct Entry {
-    pub x: u32,
-    pub y: u32,
-    pub node_id: Uuid,
-    pub position_id: Option<Uuid>,
-    pub entity_id: Option<Uuid>,
-    pub entity_type: Option<GridEntityType>,
-}
-
-impl Entry {
-    pub fn new(x: u32, y: u32, node_id: Uuid) -> Self {
-        Self {
-            x: x,
-            y: y,
-            node_id: node_id,
-            position_id: None,
-            entity_id: None,
-            entity_type: None,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct GridPosition {
-    pub id: Uuid,
-    pub width: u32,
-    pub height: u32,
-    pub x1: u32,
-    pub y1: u32,
-    pub x2: u32,
-    pub y2: u32,
-    pub margin: (u32, u32, u32, u32), // from 12 clockwise
-}
 
 #[derive(Resource)]
 pub struct Grid {

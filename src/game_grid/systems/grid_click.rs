@@ -26,8 +26,6 @@ pub fn grid_click(
             let hero_positions = grid.find_coords_by_type(GridEntityType::Hero);
             let axe_positions = grid.find_coords_by_type(GridEntityType::Axe);
 
-            //         let hero_positions = find_positions_by_type(&game_grid_nodes, GraphNodeType::Hero);
-            //         let axe_positions = find_positions_by_type(&game_grid_nodes, GraphNodeType::Axe);
             println!("hero at: {:?}", hero_positions);
             println!("axe at: {:?}", axe_positions);
 

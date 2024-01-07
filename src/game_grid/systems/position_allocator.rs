@@ -13,10 +13,6 @@ pub struct PositionAllocator {
 }
 
 impl PositionAllocator {
-    // pub fn free(&mut self, col_index: u32, row_index: u32) {
-    //     // remove from self.reserved_cells
-    // }
-
     pub fn reserve(&mut self, col_index: u32, row_index: u32) {
         let node = (col_index, row_index);
         if self.reserved_cells.contains(&node) {
