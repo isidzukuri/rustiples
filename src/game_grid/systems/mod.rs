@@ -55,29 +55,26 @@ pub fn generate_grid(
         ));
     }
     place_entities(&mut grid, &mut commands, window_query, asset_server);
-    
+
     commands.insert_resource(grid);
-
 }
-
 
 pub fn place_entities(
     grid: &mut Grid,
     mut commands: &mut Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
-    asset_server: Res<AssetServer>) {
-        
-        let grid_entity = GridEntityFactory::create(grid, GridEntityType::Castle);
-        let transform = Transform::from_xyz(grid_entity.x_px, grid_entity.y_px, 0.0);
-        commands.spawn((
-            SpriteBundle {
-                transform: transform,
-                texture: asset_server.load(grid_entity.config.sprite.clone()),
-                ..default()
-            },
-            grid_entity,
-        ));
-        
+    asset_server: Res<AssetServer>,
+) {
+    let grid_entity = GridEntityFactory::create(grid, GridEntityType::Castle);
+    let transform = Transform::from_xyz(grid_entity.x_px, grid_entity.y_px, 0.0);
+    commands.spawn((
+        SpriteBundle {
+            transform: transform,
+            texture: asset_server.load(grid_entity.config.sprite.clone()),
+            ..default()
+        },
+        grid_entity,
+    ));
 }
 
 pub struct GridEntityFactory {}
@@ -91,18 +88,15 @@ impl GridEntityFactory {
                     width_px: 350.0,
                     height_px: 250.0,
                     margin: (1, 1, 1, 1),
-                    entity_type: GridEntityType::Castle
+                    entity_type: GridEntityType::Castle,
                 };
 
                 grid.create_entity(&config)
-            },
-            _ => panic!("Not registered GridEntityType")
-        }        
+            }
+            _ => panic!("Not registered GridEntityType"),
+        }
     }
 }
-
-
-
 
 // pub fn spawn_sprite<T>(
 //     mut commands: &mut Commands,
@@ -127,7 +121,6 @@ impl GridEntityFactory {
 //         object,
 //     ));
 // }
-
 
 // pub fn place_entities(mut grid: ResMut<Grid>,
 //     mut commands: Commands,

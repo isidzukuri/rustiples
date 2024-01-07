@@ -35,9 +35,7 @@ impl PositionAllocator {
             if row_index == self.height && col_index == 0 {
                 break;
             }
-            if (col_index + width) < self.width
-                && (row_index + height) < self.height
-            {
+            if (col_index + width) < self.width && (row_index + height) < self.height {
                 let mut allocated = true;
 
                 for cur_col_index in col_index..(col_index + width) {
