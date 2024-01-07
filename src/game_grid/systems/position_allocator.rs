@@ -57,8 +57,8 @@ impl PositionAllocator {
                     variants.push(PositionAllocation {
                         x1: col_index,
                         y1: row_index,
-                        x2: col_index + width - 1,
-                        y2: row_index + height - 1,
+                        x2: col_index + width,
+                        y2: row_index + height,
                     });
                 }
             }

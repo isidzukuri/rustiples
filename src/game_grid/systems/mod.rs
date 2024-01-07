@@ -35,6 +35,8 @@ pub fn generate_grid(
     let height = (window.height() / GRID_CELL_WIDTH) as u32;
     let (mut grid, nodes) = Grid::new(width, height, GRID_CELL_WIDTH);
 
+    place_entities(&mut grid, &mut commands, window_query, asset_server);
+
     let half_size = GRID_CELL_WIDTH / 2.0;
     for node in nodes {
         let coords = grid.get_coords_by_node_id(&node.id);
@@ -44,7 +46,7 @@ pub fn generate_grid(
         commands.spawn((
             SpriteBundle {
                 sprite: Sprite {
-                    color: Color::GRAY,
+                    color: colorize_node_by_entity(&grid, &node),
                     custom_size: Some(Vec2::new(GRID_CELL_WIDTH, GRID_CELL_WIDTH)),
                     ..default()
                 },
@@ -54,9 +56,23 @@ pub fn generate_grid(
             node,
         ));
     }
-    place_entities(&mut grid, &mut commands, window_query, asset_server);
 
     commands.insert_resource(grid);
+}
+
+pub fn colorize_node_by_entity(grid: &Grid, node: &GridNode) -> Color {
+    if let Some(entity_type) = grid.find_entity_type_by_node(node) {
+        match entity_type {
+            GridEntityType::Castle => Color::GOLD,
+            GridEntityType::Hero => Color::ANTIQUE_WHITE,
+            GridEntityType::Axe => Color::INDIGO,
+            GridEntityType::Tree => Color::LIME_GREEN,
+            GridEntityType::Mountain => Color::DARK_GRAY,
+            _ => Color::GRAY
+        }
+    } else{
+        Color::GRAY
+    }
 }
 
 pub fn place_entities(
@@ -97,33 +113,3 @@ impl GridEntityFactory {
         }
     }
 }
-
-// pub fn spawn_sprite<T>(
-//     mut commands: &mut Commands,
-//     asset_server: &Res<AssetServer>,
-//     object: T,
-//     world_position: WorldPosition,
-//     asset_path: &'static str,
-// ) where
-//     (bevy::prelude::SpriteBundle, T): Bundle,
-// {
-//     let x = (world_position.from_x_cell as f32 * GRID_CELL_WIDTH + world_position.width_px / 2.0)
-//         as f32;
-//     let y = (world_position.from_y_cell as f32 * GRID_CELL_WIDTH + world_position.height_px / 2.0)
-//         as f32;
-//     let transform = Transform::from_xyz(x, y, 0.0);
-//     commands.spawn((
-//         SpriteBundle {
-//             transform: transform,
-//             texture: asset_server.load(asset_path),
-//             ..default()
-//         },
-//         object,
-//     ));
-// }
-
-// pub fn place_entities(mut grid: ResMut<Grid>,
-//     mut commands: Commands,
-//     window_query: Query<&Window, With<PrimaryWindow>>,
-//     asset_server: Res<AssetServer>) {
-// }

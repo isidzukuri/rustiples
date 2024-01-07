@@ -6,15 +6,15 @@ use crate::game_grid::systems::position_allocator::PositionAllocator;
 #[derive(Debug, Eq, PartialEq, Hash, Copy, Clone)]
 pub enum GridEntityType {
     Castle,
+    Tree,
+    Axe,
+    Hero,
+    Mountain,
     // Standard,
     // Blocked,
     // RouteHead,
     // RoutePoint,
-    // Tree,
-    // Axe,
-    // Hero,
     // Mineral,
-    // Mountain,
 }
 
 #[derive(Debug, Clone)]
@@ -52,6 +52,7 @@ pub struct Entry {
     pub node_id: Uuid,
     pub position_id: Option<Uuid>,
     pub entity_id: Option<Uuid>,
+    pub entity_type: Option<GridEntityType>,
 }
 
 impl Entry {
@@ -62,6 +63,7 @@ impl Entry {
             node_id: node_id,
             position_id: None,
             entity_id: None,
+            entity_type: None
         }
     }
 }
@@ -135,23 +137,23 @@ impl Grid {
                     id: Uuid::new_v4(),
                     width: width,
                     height: height,
+                    margin: config.margin.clone(),
                     x1: allocation.x1 + config.margin.3,
                     y1: allocation.y1 + config.margin.2,
                     x2: allocation.x2 - config.margin.1,
                     y2: allocation.y2 - config.margin.0,
-                    margin: config.margin.clone(),
                 };
 
                 let grid_entity = GridEntity {
                     id: Uuid::new_v4(),
                     entity_type: config.entity_type,
                     x_px: (grid_position.x1 as f32 * self.node_size + config.width_px / 2.0) as f32,
-                    y_px: (grid_position.y1 as f32 * self.node_size + config.width_px / 2.0) as f32,
+                    y_px: (grid_position.y1 as f32 * self.node_size + config.height_px / 2.0) as f32,
                     config: config.clone(),
                 };
 
-                for cur_x in allocation.x1..allocation.x2 {
-                    for cur_y in allocation.y1..allocation.y2 {
+                for cur_x in grid_position.x1..grid_position.x2 {
+                    for cur_y in grid_position.y1..grid_position.y2 {
                         let mut entry = self
                             .entries
                             .iter_mut()
@@ -159,6 +161,7 @@ impl Grid {
                             .unwrap();
                         entry.position_id = Some(grid_position.id);
                         entry.entity_id = Some(grid_entity.id);
+                        entry.entity_type = Some(config.entity_type);
                     }
                 }
 
@@ -175,6 +178,14 @@ impl Grid {
             _ => panic!("Entry with such node_id does not exists in the grid"),
         }
     }
+
+    pub fn find_entity_type_by_node(&self, node: &GridNode) -> Option<GridEntityType>{
+        match self.entries.iter().find(|entry| entry.node_id == node.id) {
+            Some(entry) => entry.entity_type,
+            _ => panic!("Entry with such node_id does not exists in the grid"),
+        }
+    }
+
 
     // pub fn move_entity(){
     // mutate alocator
