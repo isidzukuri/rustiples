@@ -10,11 +10,11 @@ pub enum GridEntityType {
     Axe,
     Hero,
     Mountain,
-    // Standard,
-    // Blocked,
-    // RouteHead,
-    // RoutePoint,
-    // Mineral,
+    Water, // Standard,
+           // Blocked,
+           // RouteHead,
+           // RoutePoint,
+           // Mineral,
 }
 
 #[derive(Debug, Clone)]
@@ -63,7 +63,7 @@ impl Entry {
             node_id: node_id,
             position_id: None,
             entity_id: None,
-            entity_type: None
+            entity_type: None,
         }
     }
 }
@@ -148,7 +148,8 @@ impl Grid {
                     id: Uuid::new_v4(),
                     entity_type: config.entity_type,
                     x_px: (grid_position.x1 as f32 * self.node_size + config.width_px / 2.0) as f32,
-                    y_px: (grid_position.y1 as f32 * self.node_size + config.height_px / 2.0) as f32,
+                    y_px: (grid_position.y1 as f32 * self.node_size + config.height_px / 2.0)
+                        as f32,
                     config: config.clone(),
                 };
 
@@ -179,13 +180,12 @@ impl Grid {
         }
     }
 
-    pub fn find_entity_type_by_node(&self, node: &GridNode) -> Option<GridEntityType>{
+    pub fn find_entity_type_by_node(&self, node: &GridNode) -> Option<GridEntityType> {
         match self.entries.iter().find(|entry| entry.node_id == node.id) {
             Some(entry) => entry.entity_type,
             _ => panic!("Entry with such node_id does not exists in the grid"),
         }
     }
-
 
     // pub fn move_entity(){
     // mutate alocator

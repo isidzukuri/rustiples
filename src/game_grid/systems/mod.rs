@@ -68,9 +68,9 @@ pub fn colorize_node_by_entity(grid: &Grid, node: &GridNode) -> Color {
             GridEntityType::Axe => Color::INDIGO,
             GridEntityType::Tree => Color::LIME_GREEN,
             GridEntityType::Mountain => Color::DARK_GRAY,
-            _ => Color::GRAY
+            _ => Color::GRAY,
         }
-    } else{
+    } else {
         Color::GRAY
     }
 }
@@ -81,35 +81,83 @@ pub fn place_entities(
     window_query: Query<&Window, With<PrimaryWindow>>,
     asset_server: Res<AssetServer>,
 ) {
-    let grid_entity = GridEntityFactory::create(grid, GridEntityType::Castle);
-    let transform = Transform::from_xyz(grid_entity.x_px, grid_entity.y_px, 0.0);
-    commands.spawn((
-        SpriteBundle {
-            transform: transform,
-            texture: asset_server.load(grid_entity.config.sprite.clone()),
-            ..default()
-        },
-        grid_entity,
-    ));
+    let objcts_to_create = vec![
+        (GridEntityType::Castle, 2),
+        (GridEntityType::Hero, 1),
+        (GridEntityType::Axe, 1),
+        (GridEntityType::Tree, 10),
+        (GridEntityType::Mountain, 10),
+        // (GridEntityType::Water, 5),
+    ];
+
+    for (entity_type, quantity) in objcts_to_create {
+        for _ in 0..quantity {
+            let grid_entity = GridEntityFactory::create(grid, entity_type);
+            let transform = Transform::from_xyz(grid_entity.x_px, grid_entity.y_px, 0.0);
+            commands.spawn((
+                SpriteBundle {
+                    transform: transform,
+                    texture: asset_server.load(grid_entity.config.sprite.clone()),
+                    ..default()
+                },
+                grid_entity,
+            ));
+        }
+    }
 }
 
 pub struct GridEntityFactory {}
 
 impl GridEntityFactory {
     pub fn create(grid: &mut Grid, obj_type: GridEntityType) -> GridEntity {
-        match obj_type {
-            GridEntityType::Castle => {
-                let config = GridEntityConfig {
-                    sprite: "sprites/castle.png".to_string(),
-                    width_px: 350.0,
-                    height_px: 250.0,
-                    margin: (1, 1, 1, 1),
-                    entity_type: GridEntityType::Castle,
-                };
-
-                grid.create_entity(&config)
-            }
+        let config = match obj_type {
+            GridEntityType::Castle => GridEntityConfig {
+                sprite: "sprites/castle.png".to_string(),
+                width_px: 350.0,
+                height_px: 250.0,
+                margin: (1, 1, 1, 1),
+                entity_type: obj_type,
+            },
+            GridEntityType::Hero => GridEntityConfig {
+                sprite: "sprites/hero.png".to_string(),
+                width_px: 50.0,
+                height_px: 50.0,
+                margin: (0, 0, 0, 0),
+                entity_type: obj_type,
+            },
+            GridEntityType::Axe => GridEntityConfig {
+                sprite: "sprites/axe.png".to_string(),
+                width_px: 50.0,
+                height_px: 50.0,
+                margin: (0, 0, 0, 0),
+                entity_type: obj_type,
+            },
+            GridEntityType::Tree => GridEntityConfig {
+                sprite: "sprites/tree.png".to_string(),
+                width_px: 50.0,
+                height_px: 50.0,
+                margin: (0, 0, 0, 0),
+                entity_type: obj_type,
+            },
+            GridEntityType::Mountain => GridEntityConfig {
+                sprite: "sprites/mountain_50.png".to_string(),
+                width_px: 50.0,
+                height_px: 50.0,
+                margin: (0, 0, 0, 0),
+                entity_type: obj_type,
+            },
+            // GridEntityType::Water => {
+            //     GridEntityConfig {
+            //        sprite: "sprites/water_50.png".to_string(),
+            //        width_px: 50.0,
+            //        height_px: 50.0,
+            //        margin: (0, 0, 0, 0),
+            //        entity_type: obj_type,
+            //    }
+            // },
             _ => panic!("Not registered GridEntityType"),
-        }
+        };
+
+        grid.create_entity(&config)
     }
 }
