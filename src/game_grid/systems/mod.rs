@@ -1,29 +1,16 @@
-// pub mod ai;
-// pub mod game_buttons;
-// pub mod generators;
-// pub mod grid;
-// pub mod position;
-
-// pub use crate::game_grid::ai::pathfinding_params::*;
-// pub use crate::game_grid::ai::*;
-// pub use crate::game_grid::game_buttons::*;
-// pub use crate::game_grid::generators::generate_grid;
-// pub use crate::game_grid::generators::*;
-// pub use crate::game_grid::graph_node::*;
-// pub use crate::game_grid::grid::*;
-// pub use crate::game_grid::position::world_position::*;
-// pub use crate::game_grid::position::*;
-
+pub mod ai;
+pub mod grid_click;
+pub mod grid_entity_factory;
 pub mod position_allocator;
 
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 use crate::game_grid::grid::*;
-use position_allocator::*;
+pub use crate::game_grid::grid_click::grid_click;
+use crate::game_grid::grid_entity_factory::GridEntityFactory;
 
-pub const GRID_CELL_WIDTH: f32 = 50.0 as f32;
-pub const HALF_GRID_CELL_WIDTH: f32 = 25.0 as f32;
+pub const GRID_NODE_SIZE: f32 = 50.0 as f32;
 
 pub fn generate_grid(
     mut commands: Commands,
@@ -31,23 +18,23 @@ pub fn generate_grid(
     asset_server: Res<AssetServer>,
 ) {
     let window = window_query.get_single().unwrap();
-    let width = (window.width() / GRID_CELL_WIDTH) as u32;
-    let height = (window.height() / GRID_CELL_WIDTH) as u32;
-    let (mut grid, nodes) = Grid::new(width, height, GRID_CELL_WIDTH);
+    let width = (window.width() / GRID_NODE_SIZE) as u32;
+    let height = (window.height() / GRID_NODE_SIZE) as u32;
+    let (mut grid, nodes) = Grid::new(width, height, GRID_NODE_SIZE);
 
     place_entities(&mut grid, &mut commands, window_query, asset_server);
 
-    let half_size = GRID_CELL_WIDTH / 2.0;
+    let half_size = GRID_NODE_SIZE / 2.0;
     for node in nodes {
         let coords = grid.get_coords_by_node_id(&node.id);
-        let window_x = GRID_CELL_WIDTH * coords.0 as f32 + half_size;
-        let window_y = GRID_CELL_WIDTH * coords.1 as f32 + half_size;
+        let window_x = GRID_NODE_SIZE * coords.0 as f32 + half_size;
+        let window_y = GRID_NODE_SIZE * coords.1 as f32 + half_size;
 
         commands.spawn((
             SpriteBundle {
                 sprite: Sprite {
                     color: colorize_node_by_entity(&grid, &node),
-                    custom_size: Some(Vec2::new(GRID_CELL_WIDTH, GRID_CELL_WIDTH)),
+                    custom_size: Some(Vec2::new(GRID_NODE_SIZE, GRID_NODE_SIZE)),
                     ..default()
                 },
                 transform: Transform::from_translation(Vec3::new(window_x, window_y, -1.)),
@@ -103,61 +90,5 @@ pub fn place_entities(
                 grid_entity,
             ));
         }
-    }
-}
-
-pub struct GridEntityFactory {}
-
-impl GridEntityFactory {
-    pub fn create(grid: &mut Grid, obj_type: GridEntityType) -> GridEntity {
-        let config = match obj_type {
-            GridEntityType::Castle => GridEntityConfig {
-                sprite: "sprites/castle.png".to_string(),
-                width_px: 350.0,
-                height_px: 250.0,
-                margin: (1, 1, 1, 1),
-                entity_type: obj_type,
-            },
-            GridEntityType::Hero => GridEntityConfig {
-                sprite: "sprites/hero.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::Axe => GridEntityConfig {
-                sprite: "sprites/axe.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::Tree => GridEntityConfig {
-                sprite: "sprites/tree.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::Mountain => GridEntityConfig {
-                sprite: "sprites/mountain_50.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            // GridEntityType::Water => {
-            //     GridEntityConfig {
-            //        sprite: "sprites/water_50.png".to_string(),
-            //        width_px: 50.0,
-            //        height_px: 50.0,
-            //        margin: (0, 0, 0, 0),
-            //        entity_type: obj_type,
-            //    }
-            // },
-            _ => panic!("Not registered GridEntityType"),
-        };
-
-        grid.create_entity(&config)
     }
 }

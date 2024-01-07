@@ -187,6 +187,30 @@ impl Grid {
         }
     }
 
+    pub fn find_entry_by_node(&self, node: &GridNode) -> &Entry {
+        match self.entries.iter().find(|entry| entry.node_id == node.id) {
+            Some(entry) => entry,
+            _ => panic!("Entry with such node_id does not exists in the grid"),
+        }
+    }
+
+    pub fn find_entry_by_coords(&self, x: &u32, y: &u32) -> Option<&Entry> {
+        self.entries
+            .iter()
+            .find(|entry| &entry.x == x && &entry.y == y)
+    }
+
+    pub fn find_coords_by_type(&self, entity_type: GridEntityType) -> Vec<(u32, u32)> {
+        let comparable = Some(entity_type);
+        let mut result = vec![];
+        for entry in self.entries.iter() {
+            if entry.entity_type == comparable {
+                result.push((entry.x, entry.y));
+            }
+        }
+        result
+    }
+
     // pub fn move_entity(){
     // mutate alocator
     // delete current position

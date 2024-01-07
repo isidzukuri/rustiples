@@ -1,4 +1,4 @@
-use crate::game_grid::graph_node::*;
+// use crate::game_grid::graph_node::*;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 
@@ -14,12 +14,12 @@ use crate::game_grid::ai::pathfinding_params::*;
 use crate::game_grid::ai::pickup_axe_action::*;
 use crate::game_grid::ai::state::*;
 
-// actions:
-// - find path [done]
-// - pickup axe [done]
-// - pickup wood
-// - pickup iron
-// - craft axe
+// // actions:
+// // - find path [done]
+// // - pickup axe [done]
+// // - pickup wood
+// // - pickup iron
+// // - craft axe
 
 pub fn plan_path(mut params: PathfindingParams) -> Option<Vec<(u32, u32)>> {
     let mut state = State {
@@ -29,7 +29,7 @@ pub fn plan_path(mut params: PathfindingParams) -> Option<Vec<(u32, u32)>> {
         destination_reached: false,
     };
     state.actions.push_front(Box::new(FindPathAction {}));
-    
+
     while let Some(action) = state.actions.pop_front() {
         action.exec(&mut params, &mut state);
 
@@ -42,7 +42,7 @@ pub fn plan_path(mut params: PathfindingParams) -> Option<Vec<(u32, u32)>> {
     None
 }
 
-// (col, row)
+// // (col, row)
 pub fn find_path(params: &mut PathfindingParams) -> Option<Vec<(u32, u32)>> {
     let mut open_set: Vec<(u32, u32)> = vec![];
     open_set.push(*params.start_node);
@@ -89,15 +89,18 @@ pub fn find_path(params: &mut PathfindingParams) -> Option<Vec<(u32, u32)>> {
         };
 
         for neighbor in connections.iter() {
-            let neighbor_node = params.game_grid_nodes.iter().find(|node| {
-                (node.col == neighbor.0 && node.row == neighbor.1)
-                    && params.graph_node_types.contains(&node.node_type)
+            let neighbor_node = params.grid.entries.iter().find(|entry| {
+                (entry.x == neighbor.0 && entry.y == neighbor.1)
+                    && (match entry.entity_type {
+                        Some(entity_type) => params.graph_node_types.contains(&entity_type),
+                        None => true,
+                    })
             });
             if neighbor_node.is_none() {
                 continue;
             };
 
-            let pathing_cost = PATHING_COST[&neighbor_node.unwrap().node_type];
+            let pathing_cost = 1.0;
 
             let tentative_g_score = g_score.get(&current).unwrap() + pathing_cost;
             if &tentative_g_score < g_score.get(&neighbor).unwrap_or(&f32::INFINITY) {
@@ -137,57 +140,57 @@ pub fn reconstruct_path(
     total_path
 }
 
-pub fn find_position_amid(
-    params: &PathfindingParams,
-    node_type: GraphNodeType,
-) -> Option<(u32, u32)> {
-    let mut node_rates: Vec<((u32, u32), f32)> = vec![];
+// pub fn find_position_amid(
+//     params: &PathfindingParams,
+//     node_type: GraphNodeType,
+// ) -> Option<(u32, u32)> {
+//     let mut node_rates: Vec<((u32, u32), f32)> = vec![];
 
-    for node in params.game_grid_nodes.iter() {
-        if node.node_type != GraphNodeType::Standard { continue; }
+//     for node in params.game_grid_nodes.iter() {
+//         if node.node_type != GraphNodeType::Standard { continue; }
 
-        let convolution_window = convolution_window_nodes((node.col, node.row), 2);
-        let rate = params
-            .game_grid_nodes
-            .iter()
-            .filter(|grid_node| {
-                grid_node.node_type == node_type
-                    && convolution_window.contains(&(grid_node.col, grid_node.row))
-            })
-            .count();
+//         let convolution_window = convolution_window_nodes((node.col, node.row), 2);
+//         let rate = params
+//             .game_grid_nodes
+//             .iter()
+//             .filter(|grid_node| {
+//                 grid_node.node_type == node_type
+//                     && convolution_window.contains(&(grid_node.col, grid_node.row))
+//             })
+//             .count();
 
-        node_rates.push(((node.col, node.row), (rate as f32)));
-    }
+//         node_rates.push(((node.col, node.row), (rate as f32)));
+//     }
 
-    match node_rates.iter().max_by(|a, b| a.1.total_cmp(&b.1)) {
-        Some(rate) => return Some(rate.0),
-        None => return None,
-    }
-}
+//     match node_rates.iter().max_by(|a, b| a.1.total_cmp(&b.1)) {
+//         Some(rate) => return Some(rate.0),
+//         None => return None,
+//     }
+// }
 
-pub fn convolution_window_nodes(node: (u32, u32), size: u32) -> Vec<(u32, u32)> {
-    let mut nodes: Vec<(u32, u32)> = vec![node];
-    let mut shift = 1;
+// pub fn convolution_window_nodes(node: (u32, u32), size: u32) -> Vec<(u32, u32)> {
+//     let mut nodes: Vec<(u32, u32)> = vec![node];
+//     let mut shift = 1;
 
-    while shift <= size {
-        nodes.push((node.0 + shift, node.1));
-        nodes.push((node.0, node.1 + shift));
-        nodes.push((node.0 + shift, node.1 + shift));
+//     while shift <= size {
+//         nodes.push((node.0 + shift, node.1));
+//         nodes.push((node.0, node.1 + shift));
+//         nodes.push((node.0 + shift, node.1 + shift));
 
-        if (node.1 as i32 - shift as i32) > 0 {
-            nodes.push((node.0, node.1 - shift));
-            nodes.push((node.0 + shift, node.1 - shift));
-        };
-        if (node.0 as i32 - shift as i32) > 0 {
-            nodes.push((node.0 - shift, node.1));
-            nodes.push((node.0 - shift, node.1 + shift));
-        };
-        if (node.1 as i32 - shift as i32) > 0 && (node.0 as i32 - shift as i32) > 0 {
-            nodes.push((node.0 - shift, node.1 - shift));
-        }
+//         if (node.1 as i32 - shift as i32) > 0 {
+//             nodes.push((node.0, node.1 - shift));
+//             nodes.push((node.0 + shift, node.1 - shift));
+//         };
+//         if (node.0 as i32 - shift as i32) > 0 {
+//             nodes.push((node.0 - shift, node.1));
+//             nodes.push((node.0 - shift, node.1 + shift));
+//         };
+//         if (node.1 as i32 - shift as i32) > 0 && (node.0 as i32 - shift as i32) > 0 {
+//             nodes.push((node.0 - shift, node.1 - shift));
+//         }
 
-        shift += 1;
-    }
+//         shift += 1;
+//     }
 
-    nodes
-}
+//     nodes
+// }
