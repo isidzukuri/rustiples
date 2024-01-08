@@ -21,7 +21,7 @@ pub fn generate_grid(
 
     let half_size = GRID_NODE_SIZE / 2.0;
     for node in nodes {
-        let coords = grid.get_coords_by_node_id(&node.id);
+        let coords = grid.find_coords_by_node_id(&node.id);
         let window_x = GRID_NODE_SIZE * coords.0 as f32 + half_size;
         let window_y = GRID_NODE_SIZE * coords.1 as f32 + half_size;
 

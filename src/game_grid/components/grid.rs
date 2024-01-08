@@ -111,7 +111,7 @@ impl Grid {
         }
     }
 
-    pub fn get_coords_by_node_id(&self, node_id: &Uuid) -> (u32, u32) {
+    pub fn find_coords_by_node_id(&self, node_id: &Uuid) -> (u32, u32) {
         match self.index.iter().find(|entry| &entry.node_id == node_id) {
             Some(entry) => (entry.x, entry.y),
             _ => panic!("Entry with such node_id does not exists in the grid"),

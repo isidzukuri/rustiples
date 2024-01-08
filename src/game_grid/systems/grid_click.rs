@@ -31,26 +31,15 @@ pub fn grid_click(
                 if grid.find_entity_type_by_node(&node).is_none() {
                     sprite.color = Color::GRAY;
                 }
-            }
-            // clean_route();
-            //         make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RoutePoint);
-            //         make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RouteHead);
-
-            // for i in grid.index() {
-            //     println!("{:?}", i)
-            // }
-
-            // println!("{:?}", grid.index());
-
+            } // clean_route();
+            
             let hero_positions = grid.find_coords_by_type(GridEntityType::Hero);
             let axe_positions = grid.find_coords_by_type(GridEntityType::Axe);
 
-            println!("hero at: {:?}", hero_positions);
-            println!("axe at: {:?}", axe_positions);
+            // println!("hero at: {:?}", hero_positions);
+            // println!("axe at: {:?}", axe_positions);
 
             let mut travels_thru = vec![
-                // GridEntityType::Standard,
-                // GridEntityType::RouteHead,
                 GridEntityType::Axe,
                 // GridEntityType::Mineral,
             ];
