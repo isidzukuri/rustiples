@@ -11,7 +11,7 @@ use crate::game_grid::systems::position_allocator::PositionAllocator;
 
 #[derive(Resource)]
 pub struct Grid {
-    pub index: Vec<Entry>,
+    index: Vec<Entry>,
     positions: Vec<GridPosition>,
     allocator: PositionAllocator,
     node_size: f32,
@@ -138,6 +138,10 @@ impl Grid {
             }
         }
         result
+    }
+
+    pub fn index(&self) -> &Vec<Entry> {
+        &self.index
     }
 
     // pub fn move_entity(){

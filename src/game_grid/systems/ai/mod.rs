@@ -89,7 +89,7 @@ pub fn find_path(params: &mut PathfindingParams) -> Option<Vec<(u32, u32)>> {
         };
 
         for neighbor in connections.iter() {
-            let neighbor_node = params.grid.index.iter().find(|entry| {
+            let neighbor_node = params.grid.index().iter().find(|entry| {
                 (entry.x == neighbor.0 && entry.y == neighbor.1)
                     && (match entry.entity_type {
                         Some(entity_type) => params.graph_node_types.contains(&entity_type),
