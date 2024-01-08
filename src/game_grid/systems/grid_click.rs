@@ -56,11 +56,11 @@ pub fn grid_click(
             ];
 
             let mut pathfinding_params = PathfindingParams {
-                start_node: &hero_positions[0],
-                end_node: &(col_index, row_index),
+                start_node: hero_positions[0],
+                end_node: (col_index, row_index),
                 grid: &grid,
                 graph_node_types: travels_thru,
-                axe_position: &axe_positions[0],
+                axe_positions: axe_positions,
             };
 
             // println!("{:?}",find_position_amid(&pathfinding_params, GridEntityType::Tree));

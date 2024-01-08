@@ -28,7 +28,7 @@ pub fn plan_path(mut params: PathfindingParams) -> State {
     state.actions.push_front(Box::new(FindPathAction {}));
 
     while let Some(action) = state.actions.pop_front() {
-        action.exec(&mut params, &mut state);
+        if action.is_available(&params) {action.exec(&mut params, &mut state);}
 
         if state.destination_reached {
             state.actions.clear();
@@ -42,14 +42,14 @@ pub fn plan_path(mut params: PathfindingParams) -> State {
 // // (col, row)
 pub fn find_path(params: &mut PathfindingParams) -> Option<Vec<(u32, u32)>> {
     let mut open_set: Vec<(u32, u32)> = vec![];
-    open_set.push(*params.start_node);
+    open_set.push(params.start_node);
 
     let mut came_from: HashMap<(u32, u32), (u32, u32)> = HashMap::new();
     let mut g_score: HashMap<(u32, u32), f32> = HashMap::new();
-    g_score.insert(*params.start_node, 0.0);
+    g_score.insert(params.start_node, 0.0);
 
     let mut f_score: HashMap<(u32, u32), f32> = HashMap::new();
-    f_score.insert(*params.start_node, 0.0);
+    f_score.insert(params.start_node, 0.0);
 
     while open_set.len() > 0 {
         let mut current = open_set[0];
@@ -62,7 +62,7 @@ pub fn find_path(params: &mut PathfindingParams) -> Option<Vec<(u32, u32)>> {
             }
         }
 
-        if &current == params.end_node {
+        if current == params.end_node {
             println!(
                 "------- A* score: {} --------",
                 f_score.get(&current).unwrap()
@@ -120,18 +120,18 @@ pub fn find_path(params: &mut PathfindingParams) -> Option<Vec<(u32, u32)>> {
 
 pub fn reconstruct_path(
     came_from: HashMap<(u32, u32), (u32, u32)>,
-    end: &(u32, u32),
+    end: (u32, u32),
 ) -> Vec<(u32, u32)> {
     let mut total_path = vec![];
 
-    total_path.push(*end);
+    total_path.push(end);
 
     let mut current = end;
 
     while came_from.contains_key(&current) {
-        current = came_from.get(&current).unwrap();
+        current = *came_from.get(&current).unwrap();
 
-        total_path.insert(0, *current);
+        total_path.insert(0, current);
     }
 
     total_path
