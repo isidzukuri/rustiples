@@ -4,12 +4,14 @@ use std::collections::VecDeque;
 
 pub mod action;
 pub mod find_path_action;
+pub mod mutation;
 pub mod pathfinding_params;
 pub mod pickup_axe_action;
 pub mod state;
 
 use crate::game_grid::ai::action::*;
 use crate::game_grid::ai::find_path_action::*;
+pub use crate::game_grid::ai::mutation::*;
 use crate::game_grid::ai::pathfinding_params::*;
 use crate::game_grid::ai::pickup_axe_action::*;
 use crate::game_grid::ai::state::*;
@@ -21,13 +23,8 @@ use crate::game_grid::systems::GridEntityType;
 // // - pickup iron
 // // - craft axe
 
-pub fn plan_path(mut params: PathfindingParams) -> Option<Vec<(u32, u32)>> {
-    let mut state = State {
-        path: None,
-        cost: None,
-        actions: VecDeque::new(),
-        destination_reached: false,
-    };
+pub fn plan_path(mut params: PathfindingParams) -> State {
+    let mut state = State::new();
     state.actions.push_front(Box::new(FindPathAction {}));
 
     while let Some(action) = state.actions.pop_front() {
@@ -35,11 +32,11 @@ pub fn plan_path(mut params: PathfindingParams) -> Option<Vec<(u32, u32)>> {
 
         if state.destination_reached {
             state.actions.clear();
-            return state.path;
+            break;
         }
     }
 
-    None
+    state
 }
 
 // // (col, row)

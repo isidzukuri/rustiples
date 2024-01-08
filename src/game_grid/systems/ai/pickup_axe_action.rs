@@ -1,5 +1,7 @@
 use super::find_path;
 use super::find_path_action::FindPathAction;
+use super::mutation::Mutation;
+use super::mutation::MutationType;
 use super::Action;
 use super::PathfindingParams;
 use super::State;
@@ -28,6 +30,11 @@ impl Action for PickupAxeAction {
                 state.path = path_to_axe;
             }
 
+            state.mutations.push(Mutation {
+                entity_id: None,
+                mutation_type: MutationType::Destroy,
+                coords: *params.axe_position,
+            });
             state.actions.push_front(Box::new(FindPathAction {}));
             params.graph_node_types.push(GridEntityType::Tree);
         }

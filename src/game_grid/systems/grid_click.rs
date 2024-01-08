@@ -4,9 +4,12 @@ use bevy::window::PrimaryWindow;
 use crate::game_grid::ai::pathfinding_params::PathfindingParams;
 use crate::game_grid::ai::*;
 use crate::game_grid::grid::GridEntityType;
+use crate::game_grid::grid_entity;
 use crate::game_grid::systems::Grid;
 use crate::game_grid::systems::GridEntity;
 use crate::game_grid::systems::GridNode;
+// use crate::game_grid::ai::Mutation;
+use crate::game_grid::ai::mutation::*;
 
 use super::GRID_NODE_SIZE;
 
@@ -14,9 +17,13 @@ pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
-    grid: ResMut<Grid>,
+    mut grid: ResMut<Grid>,
     mut game_grid_nodes: Query<(&mut Sprite, &mut GridNode), With<GridNode>>,
-    mut grid_entities: Query<(&mut Sprite, &mut GridEntity), (With<GridEntity>, Without<GridNode>)>,
+    mut grid_entities: Query<
+        (Entity, &mut Sprite, &mut GridEntity),
+        (With<GridEntity>, Without<GridNode>),
+    >,
+    mut commands: Commands,
 ) {
     if mouse.just_pressed(MouseButton::Right) {
         if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {
@@ -52,9 +59,9 @@ pub fn grid_click(
 
             // println!("{:?}",find_position_amid(&pathfinding_params, GridEntityType::Tree));
             // let path = find_path(&mut pathfinding_params);
-            let path = plan_path(pathfinding_params);
+            let mut state = plan_path(pathfinding_params);
 
-            match path {
+            match state.path {
                 None => {
                     println!("There is no way")
                 }
@@ -73,9 +80,33 @@ pub fn grid_click(
                                     })
                             })
                         {
-                            sprite.color = Color::PURPLE;
-                            // node.node_type = GridEntityType::RoutePoint;
+                            sprite.color = Color::PURPLE; //route point
+
+                            if grid.find_entity_type_by_node(&node).is_some() {
+                                state.mutations.push(Mutation {
+                                    entity_id: None,
+                                    mutation_type: MutationType::Destroy,
+                                    coords: (node.x, node.y),
+                                })
+                            }
                         };
+                    }
+                }
+            }
+
+            for mutation in state.mutations {
+                let id = grid
+                    .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
+                    .unwrap()
+                    .entity_id
+                    .unwrap();
+                if let Some((entity, sprite, grid_entity)) = grid_entities
+                    .iter()
+                    .find(|(_, _, grid_entity)| grid_entity.id == id)
+                {
+                    if mutation.mutation_type == MutationType::Destroy {
+                        grid.delete_entity(grid_entity.id);
+                        commands.entity(entity).despawn();
                     }
                 }
             }

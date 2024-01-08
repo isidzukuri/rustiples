@@ -153,17 +153,28 @@ impl Grid {
         &self.index
     }
 
+    pub fn delete_entity(&mut self, entity_id: Uuid) {
+        let mut coords_to_release = vec![];
+        let mut position_id = None;
+        for entry in self.index.iter_mut() {
+            if entry.entity_id != Some(entity_id) {
+                continue;
+            }
+            position_id = entry.position_id;
+            coords_to_release.push((entry.x, entry.y));
+            entry.entity_id = None;
+            entry.position_id = None;
+        }
+        self.positions
+            .retain(|position| Some(position.id) != position_id);
+        self.allocator.release_coords(coords_to_release);
+    }
+
     // pub fn move_entity(){
     // mutate alocator
     // delete current position
     // alocate new position space
     // create new position
-    // update self.index
-    // }
-
-    // pub fn delete_entity(){
-    // mutate alocator
-    // delete current position
     // update self.index
     // }
 }

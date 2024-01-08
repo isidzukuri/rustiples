@@ -85,4 +85,10 @@ impl PositionAllocator {
             }
         }
     }
+
+    pub fn release_coords(&mut self, coords_list: Vec<(u32, u32)>) {
+        for coords in coords_list {
+            self.reserved_cells.retain(|&cell| cell != coords);
+        }
+    }
 }
