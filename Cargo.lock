@@ -807,7 +807,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.41",
- "uuid",
+ "uuid 1.6.1",
 ]
 
 [[package]]
@@ -886,7 +886,7 @@ dependencies = [
  "ron",
  "serde",
  "thiserror",
- "uuid",
+ "uuid 1.6.1",
 ]
 
 [[package]]
@@ -1024,7 +1024,7 @@ dependencies = [
  "petgraph",
  "thiserror",
  "tracing",
- "uuid",
+ "uuid 1.6.1",
 ]
 
 [[package]]
@@ -1728,7 +1728,7 @@ dependencies = [
  "fnv",
  "gilrs-core",
  "log",
- "uuid",
+ "uuid 1.6.1",
  "vec_map",
 ]
 
@@ -1746,7 +1746,7 @@ dependencies = [
  "libudev-sys",
  "log",
  "nix 0.27.1",
- "uuid",
+ "uuid 1.6.1",
  "vec_map",
  "wasm-bindgen",
  "web-sys",
@@ -2909,6 +2909,7 @@ dependencies = [
  "bevy",
  "lazy_static",
  "rand",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -3319,6 +3320,16 @@ name = "unicode-xid"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f962df74c8c05a667b5ee8bcf162993134c104e96440b663c8daa176dc772d8c"
+
+[[package]]
+name = "uuid"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
+dependencies = [
+ "getrandom",
+ "serde",
+]
 
 [[package]]
 name = "uuid"

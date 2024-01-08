@@ -1,15 +1,12 @@
 pub mod ai;
-pub mod game_buttons;
-pub mod generators;
-pub mod grid;
-pub mod position;
+pub mod grid_click;
+pub mod grid_entity_factory;
+pub mod grid_generator;
+pub mod position_allocator;
 
-pub use crate::game_grid::ai::pathfinding_params::*;
-pub use crate::game_grid::ai::*;
-pub use crate::game_grid::game_buttons::*;
-pub use crate::game_grid::generators::generate_grid;
-pub use crate::game_grid::generators::*;
-pub use crate::game_grid::graph_node::*;
-pub use crate::game_grid::grid::*;
-pub use crate::game_grid::position::world_position::*;
-pub use crate::game_grid::position::*;
+pub use crate::game_grid::grid_click::grid_click;
+pub use crate::game_grid::grid_generator::generate_grid;
+
+use crate::game_grid::grid::*;
+
+pub const GRID_NODE_SIZE: f32 = 50.0 as f32;

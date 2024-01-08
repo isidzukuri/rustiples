@@ -1,9 +1,11 @@
+use crate::game_grid::grid::GridEntity;
+use crate::game_grid::grid::GridEntityType;
+
 use super::find_path;
 use super::Action;
 use super::PathfindingParams;
 use super::PickupAxeAction;
 use super::State;
-use crate::game_grid::graph_node::*;
 
 pub struct FindPathAction {}
 
@@ -23,7 +25,7 @@ impl Action for FindPathAction {
                 state.path = path;
             }
         } else {
-            if !params.graph_node_types.contains(&GraphNodeType::Tree) {
+            if !params.graph_node_types.contains(&GridEntityType::Tree) {
                 state.actions.push_front(Box::new(PickupAxeAction {}));
             }
         }

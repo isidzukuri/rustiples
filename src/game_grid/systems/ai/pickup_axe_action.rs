@@ -3,7 +3,7 @@ use super::find_path_action::FindPathAction;
 use super::Action;
 use super::PathfindingParams;
 use super::State;
-use crate::game_grid::graph_node::*;
+use crate::game_grid::grid::GridEntityType;
 
 pub struct PickupAxeAction {}
 
@@ -29,7 +29,7 @@ impl Action for PickupAxeAction {
             }
 
             state.actions.push_front(Box::new(FindPathAction {}));
-            params.graph_node_types.push(GraphNodeType::Tree);
+            params.graph_node_types.push(GridEntityType::Tree);
         }
         params.end_node = final_destination;
     }
