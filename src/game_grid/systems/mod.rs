@@ -22,7 +22,8 @@ pub fn generate_grid(
     let height = (window.height() / GRID_NODE_SIZE) as u32;
     let (mut grid, nodes) = Grid::new(width, height, GRID_NODE_SIZE);
 
-    place_entities(&mut grid, &mut commands, window_query, asset_server);
+    place_entities_precisely(&mut grid, &mut commands, &asset_server);
+    place_entities_randomly(&mut grid, &mut commands, &asset_server);
 
     let half_size = GRID_NODE_SIZE / 2.0;
     for node in nodes {
@@ -62,16 +63,13 @@ pub fn colorize_node_by_entity(grid: &Grid, node: &GridNode) -> Color {
     }
 }
 
-pub fn place_entities(
+pub fn place_entities_randomly(
     grid: &mut Grid,
     mut commands: &mut Commands,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    asset_server: Res<AssetServer>,
+    asset_server: &Res<AssetServer>,
 ) {
     let objcts_to_create = vec![
         (GridEntityType::Castle, 2),
-        (GridEntityType::Hero, 1),
-        (GridEntityType::Axe, 1),
         (GridEntityType::Tree, 10),
         (GridEntityType::Mountain, 10),
         // (GridEntityType::Water, 5),
@@ -79,16 +77,46 @@ pub fn place_entities(
 
     for (entity_type, quantity) in objcts_to_create {
         for _ in 0..quantity {
-            let grid_entity = GridEntityFactory::create(grid, entity_type);
-            let transform = Transform::from_xyz(grid_entity.x_px, grid_entity.y_px, 0.0);
-            commands.spawn((
-                SpriteBundle {
-                    transform: transform,
-                    texture: asset_server.load(grid_entity.config.sprite.clone()),
-                    ..default()
-                },
-                grid_entity,
-            ));
+            let grid_entity = GridEntityFactory::create(grid, entity_type, None);
+            spawn_sprite_bundle(commands, asset_server, grid_entity);
         }
     }
+}
+
+pub fn place_entities_precisely(
+    grid: &mut Grid,
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+) {
+    let objcts_to_create = vec![
+        (GridEntityType::Hero, vec![(0, 0)]),
+        (GridEntityType::Axe, vec![(2, 5)]),
+        (
+            GridEntityType::Tree,
+            vec![(10, 0), (10, 1), (11, 1), (12, 1), (12, 0)],
+        ),
+    ];
+
+    for (entity_type, coords_list) in objcts_to_create {
+        for coords in coords_list {
+            let grid_entity = GridEntityFactory::create(grid, entity_type, Some(coords));
+            spawn_sprite_bundle(commands, asset_server, grid_entity);
+        }
+    }
+}
+
+pub fn spawn_sprite_bundle(
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    grid_entity: GridEntity,
+) {
+    let transform = Transform::from_xyz(grid_entity.x_px, grid_entity.y_px, 0.0);
+    commands.spawn((
+        SpriteBundle {
+            transform: transform,
+            texture: asset_server.load(grid_entity.config.sprite.clone()),
+            ..default()
+        },
+        grid_entity,
+    ));
 }

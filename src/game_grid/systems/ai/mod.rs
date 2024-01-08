@@ -147,7 +147,9 @@ pub fn find_position_amid(
     let mut node_rates: Vec<((u32, u32), f32)> = vec![];
 
     for node in params.grid.index().iter() {
-        if node.entity_type.is_some() { continue; }
+        if node.entity_type.is_some() {
+            continue;
+        }
 
         let convolution_window = convolution_window_nodes((node.x, node.y), 2);
         let rate = params

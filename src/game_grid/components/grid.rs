@@ -51,13 +51,22 @@ impl Grid {
         (grid, nodes)
     }
 
-    pub fn create_entity(&mut self, config: &GridEntityConfig) -> GridEntity {
+    pub fn create_entity(
+        &mut self,
+        config: &GridEntityConfig,
+        at_coords: Option<(u32, u32)>,
+    ) -> GridEntity {
         let width = (config.width_px / self.node_size).ceil() as u32;
         let height = (config.height_px / self.node_size).ceil() as u32;
         let width_with_box = width + config.margin.1 + config.margin.3;
         let height_with_box = height + config.margin.0 + config.margin.2;
 
-        match self.allocator.allocate(width_with_box, height_with_box) {
+        let allocation = match at_coords {
+            None => self.allocator.allocate(width_with_box, height_with_box),
+            Some(coords) => self.allocator.allocate_coords(coords),
+        };
+
+        match allocation {
             None => {
                 panic!("not possible to allocate space in world for the object")
             }

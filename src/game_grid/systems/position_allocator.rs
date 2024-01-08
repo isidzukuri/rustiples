@@ -13,13 +13,19 @@ pub struct PositionAllocator {
 }
 
 impl PositionAllocator {
-    pub fn reserve(&mut self, col_index: u32, row_index: u32) {
-        let node = (col_index, row_index);
-        if self.reserved_cells.contains(&node) {
+    pub fn allocate_coords(&mut self, coords: (u32, u32)) -> Option<PositionAllocation> {
+        if self.reserved_cells.contains(&coords) {
             panic!("Position already reserved");
         }
 
-        self.reserved_cells.push(node);
+        self.reserved_cells.push(coords);
+
+        Some(PositionAllocation {
+            x1: coords.0,
+            y1: coords.1,
+            x2: coords.0 + 1,
+            y2: coords.1 + 1,
+        })
     }
 
     pub fn allocate(&mut self, width: u32, height: u32) -> Option<PositionAllocation> {

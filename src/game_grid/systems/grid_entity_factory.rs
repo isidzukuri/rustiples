@@ -1,3 +1,5 @@
+use std::sync::atomic;
+
 use crate::game_grid::systems::Grid;
 use crate::game_grid::systems::GridEntity;
 use crate::game_grid::systems::GridEntityConfig;
@@ -6,7 +8,11 @@ use crate::game_grid::systems::GridEntityType;
 pub struct GridEntityFactory {}
 
 impl GridEntityFactory {
-    pub fn create(grid: &mut Grid, obj_type: GridEntityType) -> GridEntity {
+    pub fn create(
+        grid: &mut Grid,
+        obj_type: GridEntityType,
+        at_coords: Option<(u32, u32)>,
+    ) -> GridEntity {
         let config = match obj_type {
             GridEntityType::Castle => GridEntityConfig {
                 sprite: "sprites/castle.png".to_string(),
@@ -55,6 +61,6 @@ impl GridEntityFactory {
             _ => panic!("Not registered GridEntityType"),
         };
 
-        grid.create_entity(&config)
+        grid.create_entity(&config, at_coords)
     }
 }

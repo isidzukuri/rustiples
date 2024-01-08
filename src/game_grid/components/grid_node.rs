@@ -10,6 +10,10 @@ pub struct GridNode {
 
 impl GridNode {
     pub fn new(x: u32, y: u32) -> Self {
-        Self { id: Uuid::new_v4(), x: x, y: y }
+        Self {
+            id: Uuid::new_v4(),
+            x: x,
+            y: y,
+        }
     }
 }

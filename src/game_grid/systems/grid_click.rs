@@ -23,6 +23,12 @@ pub fn grid_click(
             //         make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RoutePoint);
             //         make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RouteHead);
 
+            // for i in grid.index() {
+            //     println!("{:?}", i)
+            // }
+
+            // println!("{:?}", grid.index());
+
             let hero_positions = grid.find_coords_by_type(GridEntityType::Hero);
             let axe_positions = grid.find_coords_by_type(GridEntityType::Axe);
 
@@ -43,6 +49,8 @@ pub fn grid_click(
                 graph_node_types: graph_node_types,
                 axe_position: &axe_positions[0],
             };
+
+            // println!("{:?}",find_position_amid(&pathfinding_params, GridEntityType::Tree));
             // let path = find_path(&mut pathfinding_params);
             let path = plan_path(pathfinding_params);
 
@@ -55,9 +63,8 @@ pub fn grid_click(
                     for path_node in nodes.iter() {
                         if let Some((mut sprite, mut node)) =
                             game_grid_nodes.iter_mut().find(|(_, ref node)| {
-                                (node.x == path_node.0 && node.y == path_node.1) &&
-                                (
-                                    match grid.find_entity_type_by_node(&node) {
+                                (node.x == path_node.0 && node.y == path_node.1)
+                                    && (match grid.find_entity_type_by_node(&node) {
                                         Some(entity_type) => {
                                             entity_type != GridEntityType::Hero
                                                 && entity_type != GridEntityType::Axe

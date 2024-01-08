@@ -1,6 +1,7 @@
 use crate::game_grid::grid::GridEntityType;
 use uuid::Uuid;
 
+#[derive(Debug)]
 pub struct Entry {
     pub x: u32,
     pub y: u32,
