@@ -11,7 +11,7 @@ use crate::game_grid::systems::position_allocator::PositionAllocator;
 
 #[derive(Resource)]
 pub struct Grid {
-    pub entries: Vec<Entry>,
+    pub index: Vec<Entry>,
     positions: Vec<GridPosition>,
     allocator: PositionAllocator,
     node_size: f32,
@@ -20,7 +20,7 @@ pub struct Grid {
 impl Grid {
     pub fn new(width: u32, height: u32, node_size: f32) -> (Self, Vec<GridNode>) {
         let mut grid = Self {
-            entries: vec![],
+            index: vec![],
             positions: vec![],
             allocator: PositionAllocator {
                 width: width,
@@ -38,8 +38,8 @@ impl Grid {
                 break;
             }
 
-            let node = GridNode::new();
-            grid.entries.push(Entry::new(col_index, row_index, node.id));
+            let node = GridNode::new(col_index, row_index);
+            grid.index.push(Entry::new(col_index, row_index, node.id));
             nodes.push(node);
 
             col_index += 1;
@@ -85,7 +85,7 @@ impl Grid {
                 for cur_x in grid_position.x1..grid_position.x2 {
                     for cur_y in grid_position.y1..grid_position.y2 {
                         let mut entry = self
-                            .entries
+                            .index
                             .iter_mut()
                             .find(|entry| entry.x == cur_x && entry.y == cur_y)
                             .unwrap();
@@ -103,28 +103,28 @@ impl Grid {
     }
 
     pub fn get_coords_by_node_id(&self, node_id: &Uuid) -> (u32, u32) {
-        match self.entries.iter().find(|entry| &entry.node_id == node_id) {
+        match self.index.iter().find(|entry| &entry.node_id == node_id) {
             Some(entry) => (entry.x, entry.y),
             _ => panic!("Entry with such node_id does not exists in the grid"),
         }
     }
 
     pub fn find_entity_type_by_node(&self, node: &GridNode) -> Option<GridEntityType> {
-        match self.entries.iter().find(|entry| entry.node_id == node.id) {
+        match self.index.iter().find(|entry| entry.node_id == node.id) {
             Some(entry) => entry.entity_type,
             _ => panic!("Entry with such node_id does not exists in the grid"),
         }
     }
 
     pub fn find_entry_by_node(&self, node: &GridNode) -> &Entry {
-        match self.entries.iter().find(|entry| entry.node_id == node.id) {
+        match self.index.iter().find(|entry| entry.node_id == node.id) {
             Some(entry) => entry,
             _ => panic!("Entry with such node_id does not exists in the grid"),
         }
     }
 
     pub fn find_entry_by_coords(&self, x: &u32, y: &u32) -> Option<&Entry> {
-        self.entries
+        self.index
             .iter()
             .find(|entry| &entry.x == x && &entry.y == y)
     }
@@ -132,7 +132,7 @@ impl Grid {
     pub fn find_coords_by_type(&self, entity_type: GridEntityType) -> Vec<(u32, u32)> {
         let comparable = Some(entity_type);
         let mut result = vec![];
-        for entry in self.entries.iter() {
+        for entry in self.index.iter() {
             if entry.entity_type == comparable {
                 result.push((entry.x, entry.y));
             }
@@ -145,12 +145,12 @@ impl Grid {
     // delete current position
     // alocate new position space
     // create new position
-    // update self.entries
+    // update self.index
     // }
 
     // pub fn delete_entity(){
     // mutate alocator
     // delete current position
-    // update self.entries
+    // update self.index
     // }
 }

@@ -55,9 +55,9 @@ pub fn grid_click(
                     for path_node in nodes.iter() {
                         if let Some((mut sprite, mut node)) =
                             game_grid_nodes.iter_mut().find(|(_, ref node)| {
-                                let entry = grid.find_entry_by_node(&node);
-                                (entry.x == path_node.0 && entry.y == path_node.1)
-                                    && (match entry.entity_type {
+                                (node.x == path_node.0 && node.y == path_node.1) &&
+                                (
+                                    match grid.find_entity_type_by_node(&node) {
                                         Some(entity_type) => {
                                             entity_type != GridEntityType::Hero
                                                 && entity_type != GridEntityType::Axe
