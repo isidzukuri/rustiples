@@ -27,6 +27,12 @@ pub fn grid_click(
 ) {
     if mouse.just_pressed(MouseButton::Right) {
         if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {
+            for (mut sprite, node) in game_grid_nodes.iter_mut(){
+                if grid.find_entity_type_by_node(&node).is_none() {
+                    sprite.color = Color::GRAY;
+                }
+            }
+            // clean_route();
             //         make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RoutePoint);
             //         make_nodes_standart(&mut game_grid_nodes, GraphNodeType::RouteHead);
 
@@ -42,7 +48,7 @@ pub fn grid_click(
             println!("hero at: {:?}", hero_positions);
             println!("axe at: {:?}", axe_positions);
 
-            let mut graph_node_types = vec![
+            let mut travels_thru = vec![
                 // GridEntityType::Standard,
                 // GridEntityType::RouteHead,
                 GridEntityType::Axe,
@@ -53,7 +59,7 @@ pub fn grid_click(
                 start_node: &hero_positions[0],
                 end_node: &(col_index, row_index),
                 grid: &grid,
-                graph_node_types: graph_node_types,
+                graph_node_types: travels_thru,
                 axe_position: &axe_positions[0],
             };
 

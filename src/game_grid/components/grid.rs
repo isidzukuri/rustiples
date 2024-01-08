@@ -132,6 +132,13 @@ impl Grid {
         }
     }
 
+    pub fn find_entry_by_entity_id(&self, entity_id: Uuid) -> &Entry {
+        match self.index.iter().find(|entry| entry.entity_id == Some(entity_id)) {
+            Some(entry) => entry,
+            _ => panic!("Entry with such entoty_id does not exists in the grid"),
+        }
+    }
+
     pub fn find_entry_by_coords(&self, x: &u32, y: &u32) -> Option<&Entry> {
         self.index
             .iter()
@@ -164,6 +171,7 @@ impl Grid {
             coords_to_release.push((entry.x, entry.y));
             entry.entity_id = None;
             entry.position_id = None;
+            entry.entity_type = None;
         }
         self.positions
             .retain(|position| Some(position.id) != position_id);

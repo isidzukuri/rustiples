@@ -14,4 +14,4 @@
 - write bot which will be performing actions to win the game after some triger. Make him perform one action per second< for example.
 - build lumber mil action
 - complex flow: place castle behind the water. To path thru water bridge must be built. Must have lumber mill to build bridge. Must have axe to build a mill. Mill must be placed amid heighest density of trees.
-- fix position alocator			
+	
