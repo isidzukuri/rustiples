@@ -5,11 +5,11 @@ use crate::game_grid::ai::pathfinding_params::PathfindingParams;
 use crate::game_grid::ai::*;
 use crate::game_grid::grid::GridEntityType;
 use crate::game_grid::grid_entity;
+use crate::game_grid::grid_generator::place_entity;
+use crate::game_grid::mutation::*;
 use crate::game_grid::systems::Grid;
 use crate::game_grid::systems::GridEntity;
 use crate::game_grid::systems::GridNode;
-// use crate::game_grid::ai::Mutation;
-use crate::game_grid::ai::mutation::*;
 
 use super::GRID_NODE_SIZE;
 
@@ -17,6 +17,7 @@ pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
+    asset_server: Res<AssetServer>,
     mut grid: ResMut<Grid>,
     mut game_grid_nodes: Query<(&mut Sprite, &mut GridNode), With<GridNode>>,
     mut grid_entities: Query<
@@ -27,22 +28,19 @@ pub fn grid_click(
 ) {
     if mouse.just_pressed(MouseButton::Right) {
         if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {
-            for (mut sprite, node) in game_grid_nodes.iter_mut(){
+            for (mut sprite, node) in game_grid_nodes.iter_mut() {
                 if grid.find_entity_type_by_node(&node).is_none() {
                     sprite.color = Color::GRAY;
                 }
-            } // clean_route();
-            
+            } // clear_prev_route_markings();
+
             let hero_positions = grid.find_coords_by_type(GridEntityType::Hero);
             let axe_positions = grid.find_coords_by_type(GridEntityType::Axe);
 
             // println!("hero at: {:?}", hero_positions);
             // println!("axe at: {:?}", axe_positions);
 
-            let mut travels_thru = vec![
-                GridEntityType::Axe,
-                GridEntityType::Bridge,
-            ];
+            let mut travels_thru = vec![GridEntityType::Axe, GridEntityType::Bridge];
 
             let mut pathfinding_params = PathfindingParams {
                 start_node: hero_positions[0],
@@ -82,7 +80,7 @@ pub fn grid_click(
                                     entity_id: None,
                                     mutation_type: MutationType::Destroy,
                                     coords: (node.x, node.y),
-                                    entity_type: None
+                                    entity_type: None,
                                 })
                             }
                         };
@@ -91,16 +89,25 @@ pub fn grid_click(
             }
 
             for mutation in state.mutations {
-                let id = grid
-                    .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
-                    .unwrap()
-                    .entity_id
-                    .unwrap();
-                if let Some((entity, sprite, grid_entity)) = grid_entities
-                    .iter()
-                    .find(|(_, _, grid_entity)| grid_entity.id == id)
-                {
-                    if mutation.mutation_type == MutationType::Destroy {
+                if mutation.mutation_type == MutationType::Create {
+                    place_entity(
+                        &mut grid,
+                        &mut commands,
+                        &asset_server,
+                        mutation.entity_type.unwrap(),
+                        mutation.coords,
+                    );
+                }
+                if mutation.mutation_type == MutationType::Destroy {
+                    let id = grid
+                        .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
+                        .unwrap()
+                        .entity_id
+                        .unwrap();
+                    if let Some((entity, sprite, grid_entity)) = grid_entities
+                        .iter()
+                        .find(|(_, _, grid_entity)| grid_entity.id == id)
+                    {
                         grid.delete_entity(grid_entity.id);
                         commands.entity(entity).despawn();
                     }

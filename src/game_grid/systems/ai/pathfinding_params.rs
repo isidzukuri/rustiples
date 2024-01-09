@@ -6,5 +6,5 @@ pub struct PathfindingParams<'a> {
     pub end_node: (u32, u32),
     pub grid: &'a Grid,
     pub graph_node_types: Vec<GridEntityType>,
-    pub axe_positions: Vec<(u32, u32)>
+    pub axe_positions: Vec<(u32, u32)>, // TODO: remove it from here. Let action query for axes
 }

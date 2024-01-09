@@ -57,6 +57,33 @@ pub fn colorize_node_by_entity(grid: &Grid, node: &GridNode) -> Color {
     }
 }
 
+pub fn place_entity(
+    grid: &mut Grid,
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    entity_type: GridEntityType,
+    coords: (u32, u32),
+) {
+    let grid_entity = GridEntityFactory::create(grid, entity_type, Some(coords));
+    spawn_sprite_bundle(commands, asset_server, grid_entity);
+}
+
+pub fn spawn_sprite_bundle(
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+    grid_entity: GridEntity,
+) {
+    let transform = Transform::from_xyz(grid_entity.x_px, grid_entity.y_px, 0.0);
+    commands.spawn((
+        SpriteBundle {
+            transform: transform,
+            texture: asset_server.load(grid_entity.config.sprite.clone()),
+            ..default()
+        },
+        grid_entity,
+    ));
+}
+
 pub fn place_entities_randomly(
     grid: &mut Grid,
     mut commands: &mut Commands,
@@ -64,9 +91,9 @@ pub fn place_entities_randomly(
 ) {
     let objcts_to_create = vec![
         (GridEntityType::Castle, 2),
-        (GridEntityType::Tree, 10),
+        (GridEntityType::Tree, 15),
         (GridEntityType::Mountain, 10),
-        // (GridEntityType::Water, 5),
+        (GridEntityType::Water, 5),
     ];
 
     for (entity_type, quantity) in objcts_to_create {
@@ -89,28 +116,23 @@ pub fn place_entities_precisely(
             GridEntityType::Tree,
             vec![(10, 0), (10, 1), (11, 1), (12, 1), (12, 0)],
         ),
+        (
+            GridEntityType::Water,
+            vec![
+                (21, 0),
+                (21, 1),
+                (21, 2),
+                (22, 0),
+                (22, 1),
+                (22, 2),
+                (23, 1),
+            ],
+        ),
     ];
 
     for (entity_type, coords_list) in objcts_to_create {
         for coords in coords_list {
-            let grid_entity = GridEntityFactory::create(grid, entity_type, Some(coords));
-            spawn_sprite_bundle(commands, asset_server, grid_entity);
+            place_entity(grid, commands, asset_server, entity_type, coords);
         }
     }
-}
-
-pub fn spawn_sprite_bundle(
-    mut commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-    grid_entity: GridEntity,
-) {
-    let transform = Transform::from_xyz(grid_entity.x_px, grid_entity.y_px, 0.0);
-    commands.spawn((
-        SpriteBundle {
-            transform: transform,
-            texture: asset_server.load(grid_entity.config.sprite.clone()),
-            ..default()
-        },
-        grid_entity,
-    ));
 }

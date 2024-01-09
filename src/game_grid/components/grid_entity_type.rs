@@ -5,7 +5,7 @@ pub enum GridEntityType {
     Axe,
     Hero,
     Mountain,
-    Water, 
+    Water,
     LumberMill,
     Bridge,
     Mineral,
