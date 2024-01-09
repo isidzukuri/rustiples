@@ -111,17 +111,19 @@ impl Grid {
         }
     }
 
-    pub fn find_coords_by_node_id(&self, node_id: &Uuid) -> (u32, u32) {
-        match self.index.iter().find(|entry| &entry.node_id == node_id) {
-            Some(entry) => (entry.x, entry.y),
-            _ => panic!("Entry with such node_id does not exists in the grid"),
-        }
-    }
-
     pub fn find_entity_type_by_node(&self, node: &GridNode) -> Option<GridEntityType> {
         match self.index.iter().find(|entry| entry.node_id == node.id) {
             Some(entry) => entry.entity_type,
             _ => panic!("Entry with such node_id does not exists in the grid"),
+        }
+    }
+    
+    pub fn find_entity_type_by_coords(&self, x: &u32, y: &u32) -> Option<GridEntityType> {
+        match self.index
+            .iter()
+            .find(|entry| &entry.x == x && &entry.y == y) {
+            Some(entry) => entry.entity_type,
+            _ => panic!("Entry with such coords does not exists in the grid"),
         }
     }
 
@@ -143,6 +145,13 @@ impl Grid {
         self.index
             .iter()
             .find(|entry| &entry.x == x && &entry.y == y)
+    }
+
+    pub fn find_coords_by_node_id(&self, node_id: &Uuid) -> (u32, u32) {
+        match self.index.iter().find(|entry| &entry.node_id == node_id) {
+            Some(entry) => (entry.x, entry.y),
+            _ => panic!("Entry with such node_id does not exists in the grid"),
+        }
     }
 
     pub fn find_coords_by_type(&self, entity_type: GridEntityType) -> Vec<(u32, u32)> {
