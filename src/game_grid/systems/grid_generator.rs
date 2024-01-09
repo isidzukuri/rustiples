@@ -94,7 +94,6 @@ pub fn place_entities_randomly(
         (GridEntityType::Tree, 15),
         (GridEntityType::Mountain, 10),
         (GridEntityType::Water, 5),
-        // (GridEntityType::LumberMill, 5),
     ];
 
     for (entity_type, quantity) in objcts_to_create {

@@ -32,7 +32,7 @@ pub fn grid_click(
                 if grid.find_entity_type_by_node(&node).is_none() {
                     sprite.color = Color::GRAY;
                 }
-            } // clean_route();
+            } // clear_prev_route_markings();
 
             let hero_positions = grid.find_coords_by_type(GridEntityType::Hero);
             let axe_positions = grid.find_coords_by_type(GridEntityType::Axe);
