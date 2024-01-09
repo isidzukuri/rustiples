@@ -30,7 +30,7 @@ impl Action for BuildLumberMill {
                 coords: lumber_position,
                 entity_type: Some(GridEntityType::LumberMill)
             });
-            // state.actions.push_back(Box::new(BuildBridgeAction {}));
+            state.actions.push_back(Box::new(BuildBridge{}));
         }
         params.end_node = final_destination;
     }

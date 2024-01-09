@@ -24,13 +24,13 @@ impl Action for PickupAxe {
                 state.path = path_to_axe;
             }
 
-            state.mutations.push(Mutation {
-                entity_id: None,
-                mutation_type: MutationType::Destroy,
-                coords: axe_position,
-                entity_type: None
-            });
-            state.actions.push_front(Box::new(BuildLumberMill {}));
+            // state.mutations.push(Mutation {
+            //     entity_id: None,
+            //     mutation_type: MutationType::Destroy,
+            //     coords: axe_position,
+            //     entity_type: None
+            // });
+            state.actions.push_front(Box::new(BuildLumberMill{}));
             state.actions.push_front(Box::new(FindPath {}));
             params.graph_node_types.push(GridEntityType::Tree);
         }

@@ -10,6 +10,7 @@ use crate::game_grid::systems::GridEntity;
 use crate::game_grid::systems::GridNode;
 // use crate::game_grid::ai::Mutation;
 use crate::game_grid::ai::mutation::*;
+use crate::game_grid::grid_generator::place_entity;
 
 use super::GRID_NODE_SIZE;
 
@@ -17,6 +18,7 @@ pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
+    asset_server: Res<AssetServer>,
     mut grid: ResMut<Grid>,
     mut game_grid_nodes: Query<(&mut Sprite, &mut GridNode), With<GridNode>>,
     mut grid_entities: Query<
@@ -91,16 +93,19 @@ pub fn grid_click(
             }
 
             for mutation in state.mutations {
-                let id = grid
-                    .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
-                    .unwrap()
-                    .entity_id
-                    .unwrap();
-                if let Some((entity, sprite, grid_entity)) = grid_entities
-                    .iter()
-                    .find(|(_, _, grid_entity)| grid_entity.id == id)
-                {
-                    if mutation.mutation_type == MutationType::Destroy {
+                if mutation.mutation_type == MutationType::Create {
+                    place_entity(&mut grid, &mut commands, &asset_server, mutation.entity_type.unwrap(), mutation.coords);
+                }
+                if mutation.mutation_type == MutationType::Destroy {
+                    let id = grid
+                        .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
+                        .unwrap()
+                        .entity_id
+                        .unwrap();
+                    if let Some((entity, sprite, grid_entity)) = grid_entities
+                        .iter()
+                        .find(|(_, _, grid_entity)| grid_entity.id == id)
+                    {
                         grid.delete_entity(grid_entity.id);
                         commands.entity(entity).despawn();
                     }
