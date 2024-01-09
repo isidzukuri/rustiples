@@ -1,4 +1,4 @@
-use crate::game_grid::systems::GridEntityType;
+use crate::game_grid::grid::GridEntityType;
 use uuid::Uuid;
 
 #[derive(PartialEq, Debug)]

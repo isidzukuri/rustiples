@@ -1,12 +1,12 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-use crate::game_grid::ai::mutation::*;
 use crate::game_grid::ai::pathfinding_params::PathfindingParams;
 use crate::game_grid::ai::*;
 use crate::game_grid::grid::GridEntityType;
 use crate::game_grid::grid_entity;
 use crate::game_grid::grid_generator::place_entity;
+use crate::game_grid::mutation::*;
 use crate::game_grid::systems::Grid;
 use crate::game_grid::systems::GridEntity;
 use crate::game_grid::systems::GridNode;
