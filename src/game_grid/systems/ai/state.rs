@@ -1,11 +1,11 @@
-use super::Action;
+use super::actions;
 use crate::game_grid::ai::Mutation;
 use std::collections::VecDeque;
 
 pub struct State {
     pub path: Option<Vec<(u32, u32)>>,
     pub cost: Option<f32>,
-    pub actions: VecDeque<Box<dyn Action>>,
+    pub actions: VecDeque<Box<dyn actions::Action>>,
     pub destination_reached: bool,
     pub mutations: Vec<Mutation>,
 }

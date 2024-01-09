@@ -49,15 +49,33 @@ impl GridEntityFactory {
                 margin: (0, 0, 0, 0),
                 entity_type: obj_type,
             },
-            // GridEntityType::Water => {
-            //     GridEntityConfig {
-            //        sprite: "sprites/water_50.png".to_string(),
-            //        width_px: 50.0,
-            //        height_px: 50.0,
-            //        margin: (0, 0, 0, 0),
-            //        entity_type: obj_type,
-            //    }
-            // },
+            GridEntityType::Water => {
+                GridEntityConfig {
+                   sprite: "sprites/water_50.png".to_string(),
+                   width_px: 50.0,
+                   height_px: 50.0,
+                   margin: (0, 0, 0, 0),
+                   entity_type: obj_type,
+               }
+            },
+            GridEntityType::LumberMill => {
+                GridEntityConfig {
+                   sprite: "sprites/lumber_mill_50.png".to_string(),
+                   width_px: 50.0,
+                   height_px: 50.0,
+                   margin: (0, 0, 0, 0),
+                   entity_type: obj_type,
+               }
+            },
+            GridEntityType::Bridge => {
+                GridEntityConfig {
+                   sprite: "sprites/bridge_50.png".to_string(),
+                   width_px: 50.0,
+                   height_px: 50.0,
+                   margin: (0, 0, 0, 0),
+                   entity_type: obj_type,
+               }
+            },
             _ => panic!("Not registered GridEntityType"),
         };
 

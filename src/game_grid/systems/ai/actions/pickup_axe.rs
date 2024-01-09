@@ -1,15 +1,8 @@
-use super::find_path;
-use super::find_path_action::FindPathAction;
-use super::mutation::Mutation;
-use super::mutation::MutationType;
-use super::Action;
-use super::PathfindingParams;
-use super::State;
-use crate::game_grid::grid::GridEntityType;
+use super::*;
 
-pub struct PickupAxeAction {}
+pub struct PickupAxe {}
 
-impl Action for PickupAxeAction {
+impl Action for PickupAxe {
     fn is_available(&self, params: &PathfindingParams) -> bool {
         params.axe_positions.len() > 0
     }
@@ -35,8 +28,10 @@ impl Action for PickupAxeAction {
                 entity_id: None,
                 mutation_type: MutationType::Destroy,
                 coords: axe_position,
+                entity_type: None
             });
-            state.actions.push_front(Box::new(FindPathAction {}));
+            state.actions.push_front(Box::new(BuildLumberMill {}));
+            state.actions.push_front(Box::new(FindPath {}));
             params.graph_node_types.push(GridEntityType::Tree);
         }
         params.end_node = final_destination;

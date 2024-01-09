@@ -41,7 +41,7 @@ pub fn grid_click(
 
             let mut travels_thru = vec![
                 GridEntityType::Axe,
-                // GridEntityType::Mineral,
+                GridEntityType::Bridge,
             ];
 
             let mut pathfinding_params = PathfindingParams {
@@ -82,6 +82,7 @@ pub fn grid_click(
                                     entity_id: None,
                                     mutation_type: MutationType::Destroy,
                                     coords: (node.x, node.y),
+                                    entity_type: None
                                 })
                             }
                         };

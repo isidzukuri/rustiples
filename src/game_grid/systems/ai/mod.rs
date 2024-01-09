@@ -1,21 +1,17 @@
-// use crate::game_grid::graph_node::*;
 use std::collections::HashMap;
 use std::collections::VecDeque;
 
-pub mod action;
-pub mod find_path_action;
+pub mod actions;
 pub mod mutation;
 pub mod pathfinding_params;
-pub mod pickup_axe_action;
 pub mod state;
 
-use crate::game_grid::ai::action::*;
-use crate::game_grid::ai::find_path_action::*;
 pub use crate::game_grid::ai::mutation::*;
 use crate::game_grid::ai::pathfinding_params::*;
-use crate::game_grid::ai::pickup_axe_action::*;
 use crate::game_grid::ai::state::*;
 use crate::game_grid::systems::GridEntityType;
+use crate::game_grid::systems::GridEntity;
+
 // // actions:
 // // - find path [done]
 // // - pickup axe [done]
@@ -25,7 +21,7 @@ use crate::game_grid::systems::GridEntityType;
 
 pub fn plan_path(mut params: PathfindingParams) -> State {
     let mut state = State::new();
-    state.actions.push_front(Box::new(FindPathAction {}));
+    state.actions.push_front(Box::new(actions::FindPath {}));
 
     while let Some(action) = state.actions.pop_front() {
         if action.is_available(&params) {action.exec(&mut params, &mut state);}
