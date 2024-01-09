@@ -57,48 +57,6 @@ pub fn colorize_node_by_entity(grid: &Grid, node: &GridNode) -> Color {
     }
 }
 
-pub fn place_entities_randomly(
-    grid: &mut Grid,
-    mut commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-) {
-    let objcts_to_create = vec![
-        (GridEntityType::Castle, 2),
-        (GridEntityType::Tree, 10),
-        (GridEntityType::Mountain, 10),
-        // (GridEntityType::Water, 5),
-        // (GridEntityType::LumberMill, 5),
-    ];
-
-    for (entity_type, quantity) in objcts_to_create {
-        for _ in 0..quantity {
-            let grid_entity = GridEntityFactory::create(grid, entity_type, None);
-            spawn_sprite_bundle(commands, asset_server, grid_entity);
-        }
-    }
-}
-
-pub fn place_entities_precisely(
-    grid: &mut Grid,
-    mut commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-) {
-    let objcts_to_create = vec![
-        (GridEntityType::Hero, vec![(0, 0)]),
-        (GridEntityType::Axe, vec![(2, 5)]),
-        (
-            GridEntityType::Tree,
-            vec![(10, 0), (10, 1), (11, 1), (12, 1), (12, 0)],
-        ),
-        (GridEntityType::Water, vec![(22, 0), (22, 1), (23, 1)]),
-    ];
-
-    for (entity_type, coords_list) in objcts_to_create {
-        for coords in coords_list {
-            place_entity(grid, commands, asset_server, entity_type, coords);
-        }
-    }
-}
 pub fn place_entity(
     grid: &mut Grid,
     commands: &mut Commands,
@@ -124,4 +82,58 @@ pub fn spawn_sprite_bundle(
         },
         grid_entity,
     ));
+}
+
+pub fn place_entities_randomly(
+    grid: &mut Grid,
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+) {
+    let objcts_to_create = vec![
+        (GridEntityType::Castle, 2),
+        (GridEntityType::Tree, 15),
+        (GridEntityType::Mountain, 10),
+        (GridEntityType::Water, 5),
+        // (GridEntityType::LumberMill, 5),
+    ];
+
+    for (entity_type, quantity) in objcts_to_create {
+        for _ in 0..quantity {
+            let grid_entity = GridEntityFactory::create(grid, entity_type, None);
+            spawn_sprite_bundle(commands, asset_server, grid_entity);
+        }
+    }
+}
+
+pub fn place_entities_precisely(
+    grid: &mut Grid,
+    mut commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+) {
+    let objcts_to_create = vec![
+        (GridEntityType::Hero, vec![(0, 0)]),
+        (GridEntityType::Axe, vec![(2, 5)]),
+        (
+            GridEntityType::Tree,
+            vec![(10, 0), (10, 1), (11, 1), (12, 1), (12, 0)],
+        ),
+        (
+            GridEntityType::Water,
+            vec![
+                (21, 0),
+                (21, 1),
+                (21, 2),
+                (22, 0),
+                (22, 1),
+                (22, 2),
+                (23, 1),
+            ],
+        ),
+    ];
+
+    for (entity_type, coords_list) in objcts_to_create {
+        for coords in coords_list {
+            place_entity(grid, commands, asset_server, entity_type, coords);
+        }
+    }
 }
