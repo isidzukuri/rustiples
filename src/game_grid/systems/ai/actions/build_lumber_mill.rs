@@ -28,9 +28,9 @@ impl Action for BuildLumberMill {
                 entity_id: None,
                 mutation_type: MutationType::Create,
                 coords: lumber_position,
-                entity_type: Some(GridEntityType::LumberMill)
+                entity_type: Some(GridEntityType::LumberMill),
             });
-            state.actions.push_back(Box::new(BuildBridge{}));
+            state.actions.push_back(Box::new(BuildBridge {}));
         }
         params.end_node = final_destination;
     }

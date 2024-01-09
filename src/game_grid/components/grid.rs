@@ -117,11 +117,13 @@ impl Grid {
             _ => panic!("Entry with such node_id does not exists in the grid"),
         }
     }
-    
+
     pub fn find_entity_type_by_coords(&self, x: &u32, y: &u32) -> Option<GridEntityType> {
-        match self.index
+        match self
+            .index
             .iter()
-            .find(|entry| &entry.x == x && &entry.y == y) {
+            .find(|entry| &entry.x == x && &entry.y == y)
+        {
             Some(entry) => entry.entity_type,
             _ => panic!("Entry with such coords does not exists in the grid"),
         }
@@ -135,7 +137,11 @@ impl Grid {
     }
 
     pub fn find_entry_by_entity_id(&self, entity_id: Uuid) -> &Entry {
-        match self.index.iter().find(|entry| entry.entity_id == Some(entity_id)) {
+        match self
+            .index
+            .iter()
+            .find(|entry| entry.entity_id == Some(entity_id))
+        {
             Some(entry) => entry,
             _ => panic!("Entry with such entoty_id does not exists in the grid"),
         }

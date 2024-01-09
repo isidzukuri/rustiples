@@ -30,7 +30,7 @@ impl Action for PickupAxe {
             //     coords: axe_position,
             //     entity_type: None
             // });
-            state.actions.push_front(Box::new(BuildLumberMill{}));
+            state.actions.push_front(Box::new(BuildLumberMill {}));
             state.actions.push_front(Box::new(FindPath {}));
             params.graph_node_types.push(GridEntityType::Tree);
         }

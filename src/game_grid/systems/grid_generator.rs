@@ -90,10 +90,7 @@ pub fn place_entities_precisely(
             GridEntityType::Tree,
             vec![(10, 0), (10, 1), (11, 1), (12, 1), (12, 0)],
         ),
-        (
-            GridEntityType::Water,
-            vec![(22, 0), (22, 1), (23, 1)],
-        ),
+        (GridEntityType::Water, vec![(22, 0), (22, 1), (23, 1)]),
     ];
 
     for (entity_type, coords_list) in objcts_to_create {
@@ -106,8 +103,8 @@ pub fn place_entity(
     grid: &mut Grid,
     commands: &mut Commands,
     asset_server: &Res<AssetServer>,
-    entity_type:GridEntityType,
-    coords:(u32, u32)    
+    entity_type: GridEntityType,
+    coords: (u32, u32),
 ) {
     let grid_entity = GridEntityFactory::create(grid, entity_type, Some(coords));
     spawn_sprite_bundle(commands, asset_server, grid_entity);

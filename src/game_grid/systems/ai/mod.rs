@@ -9,8 +9,9 @@ pub mod state;
 pub use crate::game_grid::ai::mutation::*;
 use crate::game_grid::ai::pathfinding_params::*;
 use crate::game_grid::ai::state::*;
-use crate::game_grid::systems::GridEntityType;
 use crate::game_grid::systems::GridEntity;
+use crate::game_grid::systems::GridEntityType;
+use crate::game_grid::traversal_cost::*;
 
 // // actions:
 // // - find path [done]
@@ -24,7 +25,9 @@ pub fn plan_path(mut params: PathfindingParams) -> State {
     state.actions.push_front(Box::new(actions::FindPath {}));
 
     while let Some(action) = state.actions.pop_front() {
-        if action.is_available(&params) {action.exec(&mut params, &mut state);}
+        if action.is_available(&params) {
+            action.exec(&mut params, &mut state);
+        }
 
         if state.destination_reached {
             state.actions.clear();
@@ -93,7 +96,10 @@ pub fn find_path(params: &mut PathfindingParams) -> Option<Vec<(u32, u32)>> {
                 continue;
             };
 
-            let pathing_cost = 1.0;
+            let pathing_cost = match neighbor_node.unwrap().entity_type {
+                Some(entity_type) => TRAVERSAL_COST[&entity_type],
+                None => 1.0,
+            };
 
             let tentative_g_score = g_score.get(&current).unwrap() + pathing_cost;
             if &tentative_g_score < g_score.get(&neighbor).unwrap_or(&f32::INFINITY) {
