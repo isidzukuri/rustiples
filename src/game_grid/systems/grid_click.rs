@@ -28,17 +28,10 @@ pub fn grid_click(
 ) {
     if mouse.just_pressed(MouseButton::Right) {
         if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {
-            for (mut sprite, node) in game_grid_nodes.iter_mut() {
-                if grid.find_entity_type_by_node(&node).is_none() {
-                    sprite.color = Color::GRAY;
-                }
-            } // clear_prev_route_markings();
+            clear_prev_route_markings(&mut game_grid_nodes, &grid);
 
             let hero_positions = grid.find_coords_by_type(GridEntityType::Hero);
             let axe_positions = grid.find_coords_by_type(GridEntityType::Axe);
-
-            // println!("hero at: {:?}", hero_positions);
-            // println!("axe at: {:?}", axe_positions);
 
             let mut travels_thru = vec![GridEntityType::Axe, GridEntityType::Bridge];
 
@@ -57,104 +50,99 @@ pub fn grid_click(
             match state.path {
                 None => {
                     println!("There is no way")
+                    // print_world_info(commands, "There is no path!!!".to_string())
                 }
-                // None => { print_world_info(commands, "There is no path!!!".to_string()) },
-                Some(nodes) => {
-                    for path_node in nodes.iter() {
-                        if let Some((mut sprite, mut node)) =
-                            game_grid_nodes.iter_mut().find(|(_, ref node)| {
-                                (node.x == path_node.0 && node.y == path_node.1)
-                                    && (match grid.find_entity_type_by_node(&node) {
-                                        Some(entity_type) => {
-                                            entity_type != GridEntityType::Hero
-                                                && entity_type != GridEntityType::Axe
-                                        }
-                                        None => true,
-                                    })
-                            })
-                        {
-                            sprite.color = Color::PURPLE; //route point
-
-                            if grid.find_entity_type_by_node(&node).is_some() {
-                                state.mutations.push(Mutation {
-                                    entity_id: None,
-                                    mutation_type: MutationType::Destroy,
-                                    coords: (node.x, node.y),
-                                    entity_type: None,
-                                })
-                            }
-                        };
-                    }
+                Some(ref nodes) => {
+                    render_route(&mut game_grid_nodes, &grid, &mut state);
                 }
             }
 
-            for mutation in state.mutations {
-                if mutation.mutation_type == MutationType::Create {
-                    place_entity(
-                        &mut grid,
-                        &mut commands,
-                        &asset_server,
-                        mutation.entity_type.unwrap(),
-                        mutation.coords,
-                    );
-                }
-                if mutation.mutation_type == MutationType::Destroy {
-                    let id = grid
-                        .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
-                        .unwrap()
-                        .entity_id
-                        .unwrap();
-                    if let Some((entity, sprite, grid_entity)) = grid_entities
-                        .iter()
-                        .find(|(_, _, grid_entity)| grid_entity.id == id)
-                    {
-                        grid.delete_entity(grid_entity.id);
-                        commands.entity(entity).despawn();
-                    }
-                }
-            }
+            aply_mutations(
+                &mut grid,
+                &grid_entities,
+                state.mutations,
+                &mut commands,
+                &asset_server,
+            );
         }
     } else if mouse.just_pressed(MouseButton::Left) {
-        if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {
-            //         if let Some((mut sprite, mut node)) = game_grid_nodes
-            //             .iter_mut()
-            //             .find(|(_, ref node)| node.row == row_index && node.col == col_index)
-            //         {
-            //             if node.node_type != GraphNodeType::Standard {
-            //                 return;
-            //             }
-            //             // println!("{:?}", sprite);
-            //             sprite.color = Color::GREEN;
-            //             node.node_type = GraphNodeType::RouteHead;
-            //             // println!("{:?}", node);
-            //         };
+        if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {}
+    }
+}
 
-            //         let route_heads = find_positions_by_type(&game_grid_nodes, GraphNodeType::RouteHead);
+fn clear_prev_route_markings(
+    game_grid_nodes: &mut Query<(&mut Sprite, &mut GridNode), With<GridNode>>,
+    grid: &Grid,
+) {
+    for (mut sprite, node) in game_grid_nodes.iter_mut() {
+        if grid.find_entity_type_by_node(&node).is_none() {
+            sprite.color = Color::GRAY;
+        }
+    }
+}
 
-            //         // if route_heads.len() > 1 {
-            //         //     let path = find_path(
-            //         //         &route_heads[0],
-            //         //         &route_heads[1],
-            //         //         &game_grid_nodes.iter().map(|(_, node)| node).collect(),
-            //         //         None
-            //         //     );
-            //         //     match path {
-            //         //         None => {}
-            //         //         // None => { print_world_info(commands, "There is no path!!!".to_string()) },
-            //         //         Some(nodes) => {
-            //         //             for path_node in nodes.iter() {
-            //         //                 if let Some((mut sprite, mut node)) =
-            //         //                     game_grid_nodes.iter_mut().find(|(_, ref node)| {
-            //         //                         node.col == path_node.0 && node.row == path_node.1
-            //         //                     })
-            //         //                 {
-            //         //                     sprite.color = Color::PURPLE;
-            //         //                     node.node_type = GraphNodeType::RoutePoint;
-            //         //                 };
-            //         //             }
-            //         //         }
-            //         //     }
-            //         // }
+fn render_route(
+    game_grid_nodes: &mut Query<(&mut Sprite, &mut GridNode), With<GridNode>>,
+    grid: &Grid,
+    state: &mut state::State,
+) {
+    for path_node in state.path.as_ref().unwrap().iter() {
+        if let Some((mut sprite, mut node)) = game_grid_nodes.iter_mut().find(|(_, ref node)| {
+            (node.x == path_node.0 && node.y == path_node.1)
+                && (match grid.find_entity_type_by_node(&node) {
+                    Some(entity_type) => {
+                        entity_type != GridEntityType::Hero && entity_type != GridEntityType::Axe
+                    }
+                    None => true,
+                })
+        }) {
+            sprite.color = Color::PURPLE; //route point
+
+            if grid.find_entity_type_by_node(&node).is_some() {
+                state.mutations.push(Mutation {
+                    entity_id: None,
+                    mutation_type: MutationType::Destroy,
+                    coords: (node.x, node.y),
+                    entity_type: None,
+                })
+            }
+        };
+    }
+}
+
+fn aply_mutations(
+    grid: &mut Grid,
+    grid_entities: &Query<
+        (Entity, &mut Sprite, &mut GridEntity),
+        (With<GridEntity>, Without<GridNode>),
+    >,
+    mutations: Vec<Mutation>,
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+) {
+    for mutation in mutations {
+        if mutation.mutation_type == MutationType::Create {
+            place_entity(
+                grid,
+                commands,
+                asset_server,
+                mutation.entity_type.unwrap(),
+                mutation.coords,
+            );
+        }
+        if mutation.mutation_type == MutationType::Destroy {
+            let id = grid
+                .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
+                .unwrap()
+                .entity_id
+                .unwrap();
+            if let Some((entity, sprite, grid_entity)) = grid_entities
+                .iter()
+                .find(|(_, _, grid_entity)| grid_entity.id == id)
+            {
+                grid.delete_entity(grid_entity.id);
+                commands.entity(entity).despawn();
+            }
         }
     }
 }
