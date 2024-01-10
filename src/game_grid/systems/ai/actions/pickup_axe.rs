@@ -4,13 +4,18 @@ pub struct PickupAxe {}
 
 impl Action for PickupAxe {
     fn is_available(&self, params: &PathfindingParams) -> bool {
-        params.axe_positions.len() > 0
+        params.grid.find_coords_by_type(GridEntityType::Axe).len() > 0
     }
 
     fn exec(&self, params: &mut PathfindingParams, state: &mut State) {
         let final_destination = params.end_node;
 
-        let axe_position = params.axe_positions.get(0).unwrap().clone();
+        let axe_position = params
+            .grid
+            .find_coords_by_type(GridEntityType::Axe)
+            .get(0)
+            .unwrap()
+            .clone();
         params.end_node = axe_position;
 
         let path_to_axe = find_path(params);

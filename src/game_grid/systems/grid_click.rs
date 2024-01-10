@@ -31,7 +31,6 @@ pub fn grid_click(
             clear_prev_route_markings(&mut game_grid_nodes, &grid);
 
             let hero_positions = grid.find_coords_by_type(GridEntityType::Hero);
-            let axe_positions = grid.find_coords_by_type(GridEntityType::Axe);
 
             let mut travels_thru = vec![GridEntityType::Axe, GridEntityType::Bridge];
 
@@ -40,7 +39,6 @@ pub fn grid_click(
                 end_node: (col_index, row_index),
                 grid: &grid,
                 graph_node_types: travels_thru,
-                axe_positions: axe_positions,
             };
 
             // println!("{:?}",find_position_amid(&pathfinding_params, GridEntityType::Tree));
@@ -159,8 +157,6 @@ fn detect_graph_node_click(
         .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
         .map(|ray| ray.origin.truncate())
     {
-        // println!("{:?}", position);
-
         let col_index = ((position.x) / GRID_NODE_SIZE).floor() as u32;
         let row_index = ((position.y) / GRID_NODE_SIZE).floor() as u32;
 
