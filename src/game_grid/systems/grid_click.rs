@@ -37,8 +37,8 @@ pub fn grid_click(
             let mut pathfinding_params = PathfindingParams {
                 start_node: hero_positions[0],
                 end_node: (col_index, row_index),
-                grid: &grid,
                 graph_node_types: travels_thru,
+                grid: &grid,
             };
 
             // println!("{:?}",find_position_amid(&pathfinding_params, GridEntityType::Tree));
@@ -52,16 +52,15 @@ pub fn grid_click(
                 }
                 Some(ref nodes) => {
                     render_route(&mut game_grid_nodes, &grid, &mut state);
+                    aply_mutations(
+                        &mut grid,
+                        &grid_entities,
+                        state.mutations,
+                        &mut commands,
+                        &asset_server,
+                    );
                 }
             }
-
-            aply_mutations(
-                &mut grid,
-                &grid_entities,
-                state.mutations,
-                &mut commands,
-                &asset_server,
-            );
         }
     } else if mouse.just_pressed(MouseButton::Left) {
         if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {}
