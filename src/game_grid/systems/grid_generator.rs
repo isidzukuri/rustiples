@@ -18,7 +18,12 @@ pub fn generate_grid(
 
     place_entities_precisely(&mut grid, &mut commands, &asset_server);
     place_entities_randomly(&mut grid, &mut commands, &asset_server);
+    spawn_grid_nodes_sprites(&grid, nodes, &mut commands);
 
+    commands.insert_resource(grid);
+}
+
+fn spawn_grid_nodes_sprites(grid: &Grid, nodes: Vec<GridNode>, commands: &mut Commands) {
     let half_size = GRID_NODE_SIZE / 2.0;
     for node in nodes {
         let coords = grid.find_coords_by_node_id(&node.id);
@@ -38,8 +43,6 @@ pub fn generate_grid(
             node,
         ));
     }
-
-    commands.insert_resource(grid);
 }
 
 pub fn colorize_node_by_entity(grid: &Grid, node: &GridNode) -> Color {
