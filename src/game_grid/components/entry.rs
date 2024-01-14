@@ -1,7 +1,8 @@
 use crate::game_grid::grid::GridEntityType;
 use uuid::Uuid;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Entry {
     pub x: u32,
     pub y: u32,

@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use uuid::Uuid;
+use serde::{Deserialize, Serialize};
 
 pub use crate::game_grid::entry::*;
 pub use crate::game_grid::grid_entity::*;
@@ -9,7 +10,7 @@ pub use crate::game_grid::grid_node::*;
 pub use crate::game_grid::grid_position::*;
 use crate::game_grid::systems::position_allocator::PositionAllocator;
 
-#[derive(Resource)]
+#[derive(Resource, Serialize, Deserialize)]
 pub struct Grid {
     index: Vec<Entry>,
     positions: Vec<GridPosition>,

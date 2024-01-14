@@ -1,11 +1,15 @@
 use rand::prelude::SliceRandom;
-#[derive(Copy, Clone, Debug)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct PositionAllocation {
     pub x1: u32,
     pub y1: u32,
     pub x2: u32,
     pub y2: u32,
 }
+
+#[derive(Serialize, Deserialize)]
 pub struct PositionAllocator {
     pub width: u32,
     pub height: u32,

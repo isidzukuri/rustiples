@@ -1,6 +1,7 @@
 use uuid::Uuid;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GridPosition {
     pub id: Uuid,
     pub width: u32,

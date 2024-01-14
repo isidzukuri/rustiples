@@ -17,7 +17,7 @@ fn main() {
                 ..default()
             }),
             ..default()
-        }))
+        })).add_state::<AppState>()
         .add_plugins(CameraPlugin)
         .add_plugins(FpsPlugin)
         .add_plugins(WorldInfoPlugin)
@@ -27,9 +27,9 @@ fn main() {
         .run();
 }
 
-// #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-// pub enum AppState {
-//     #[default]
-//     InWorld,
-//     InCastle,
-// }
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
+pub enum AppState {
+    #[default]
+    MainMenu,
+    Grid,
+}
