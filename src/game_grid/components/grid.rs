@@ -64,7 +64,9 @@ impl Grid {
 
         let allocation = match at_coords {
             None => self.allocator.allocate(width_with_box, height_with_box),
-            Some(coords) => self.allocator.allocate_coords(coords),
+            Some(coords) => self
+                .allocator
+                .allocate_coords(coords, width_with_box, height_with_box),
         };
 
         match allocation {
@@ -170,6 +172,17 @@ impl Grid {
             }
         }
         result
+    }
+
+    pub fn find_position_by_position_id(&self, position_id: &Uuid) -> &GridPosition {
+        match self
+            .positions
+            .iter()
+            .find(|position| &position.id == position_id)
+        {
+            Some(position) => position,
+            _ => panic!("Position with such id does not exists in the grid"),
+        }
     }
 
     pub fn index(&self) -> &Vec<Entry> {

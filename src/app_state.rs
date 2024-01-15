@@ -5,4 +5,6 @@ pub enum AppState {
     #[default]
     InMainMenu,
     InGrid,
+    NewGame,
+    LoadGame,
 }

@@ -219,20 +219,20 @@ fn menu_action(
     mut app_exit_events: EventWriter<AppExit>,
     mut menu_state: ResMut<NextState<MenuState>>,
     mut app_state: ResMut<NextState<AppState>>,
-    // mut game_state: ResMut<NextState<GameState>>,
 ) {
     for (interaction, menu_button_action) in &interaction_query {
         if *interaction == Interaction::Pressed {
             match menu_button_action {
                 MenuButtonAction::Quit => app_exit_events.send(AppExit),
                 MenuButtonAction::Play => {
-                    app_state.set(AppState::InGrid);
+                    app_state.set(AppState::NewGame);
                     menu_state.set(MenuState::Disabled);
                 }
                 MenuButtonAction::Settings => menu_state.set(MenuState::Settings),
                 MenuButtonAction::BackToMainMenu => menu_state.set(MenuState::Main),
                 MenuButtonAction::LoadGame => {
-                    println!("TODO: implement game load");
+                    app_state.set(AppState::LoadGame);
+                    menu_state.set(MenuState::Disabled);
                 }
             }
         }
