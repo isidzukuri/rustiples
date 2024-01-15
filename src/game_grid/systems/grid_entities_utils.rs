@@ -1,9 +1,19 @@
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 
 use crate::game_grid::grid::*;
 use crate::game_grid::grid_entity_factory::GridEntityFactory;
 
 use super::GRID_NODE_SIZE;
+
+pub fn grid_new(
+    window_query: &Query<&Window, With<PrimaryWindow>>,
+) -> (Grid, Vec<GridNode>) {
+    let window = window_query.get_single().unwrap();
+    let width = (window.width() / GRID_NODE_SIZE) as u32;
+    let height = (window.height() / GRID_NODE_SIZE) as u32;
+    Grid::new(width, height, GRID_NODE_SIZE)
+}
 
 pub fn spawn_grid_nodes_sprites(grid: &Grid, nodes: Vec<GridNode>, commands: &mut Commands) {
     let half_size = GRID_NODE_SIZE / 2.0;

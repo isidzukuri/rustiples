@@ -10,3 +10,4 @@ At the momment game knows how to:
 - build the cheapest path from point A to point B, including decisions to pick items or create new objects along the way (for example: hero must get an axe first if he must travel thru forest or build a bridge to cross water)
 - where on the map is better to put some specific object (for example: lumber mill should be constructed amid highest density of trees)
 - destruct object on map
+- export/import map

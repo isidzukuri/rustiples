@@ -5,17 +5,12 @@ use super::grid_entities_utils::*;
 use crate::game_grid::grid::*;
 use crate::game_grid::grid_entity_factory::GridEntityFactory;
 
-use super::GRID_NODE_SIZE;
-
 pub fn generate_grid(
     commands: &mut Commands,
     window_query: &Query<&Window, With<PrimaryWindow>>,
     asset_server: &Res<AssetServer>,
 ) {
-    let window = window_query.get_single().unwrap();
-    let width = (window.width() / GRID_NODE_SIZE) as u32;
-    let height = (window.height() / GRID_NODE_SIZE) as u32;
-    let (mut grid, nodes) = Grid::new(width, height, GRID_NODE_SIZE);
+    let (mut grid, nodes) = grid_new(window_query);
 
     place_entities_precisely(&mut grid, commands, asset_server);
     place_entities_randomly(&mut grid, commands, asset_server);

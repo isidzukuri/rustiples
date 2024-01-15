@@ -3,7 +3,6 @@ use bevy::window::PrimaryWindow;
 use std::fs;
 
 use super::grid_entities_utils::*;
-use super::GRID_NODE_SIZE;
 use crate::game_grid::grid::*;
 
 pub fn load_grid(
@@ -14,14 +13,8 @@ pub fn load_grid(
     println!("Game loading...");
 
     let data = fs::read_to_string("grids/save.json").expect("Unable to read file");
-
     let temporary_grid: Grid = serde_json::from_str(&data).unwrap();
-
-    let window = window_query.get_single().unwrap();
-    let width = (window.width() / GRID_NODE_SIZE) as u32;
-    let height = (window.height() / GRID_NODE_SIZE) as u32;
-    let (mut grid, nodes) = Grid::new(width, height, GRID_NODE_SIZE);
-
+    let (mut grid, nodes) = grid_new(window_query);
     let mut used_positions = vec![];
 
     for entry in temporary_grid
