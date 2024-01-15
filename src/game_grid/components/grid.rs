@@ -1,6 +1,6 @@
 use bevy::prelude::*;
-use uuid::Uuid;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 pub use crate::game_grid::entry::*;
 pub use crate::game_grid::grid_entity::*;

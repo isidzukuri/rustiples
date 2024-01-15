@@ -27,9 +27,9 @@ pub fn spawn_menu(mut commands: &mut Commands) -> Entity {
 pub fn spawn_button(
     label: String,
     event_type: String,
-    mut commands: Commands,
-    _asset_server: Res<AssetServer>,
-    mut query: Query<Entity, With<Menu>>,
+    mut commands: &mut Commands,
+    _asset_server: &Res<AssetServer>,
+    mut query: &mut Query<Entity, With<Menu>>,
 ) {
     let mut menu = match query.get_single_mut() {
         Ok(entity) => entity,
