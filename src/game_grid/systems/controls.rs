@@ -3,7 +3,6 @@ use crate::buttons::spawn_button;
 use crate::buttons::ButtonPressedEvent;
 use crate::buttons::Menu;
 use bevy::prelude::*;
-use std::any::Any;
 use std::fs::create_dir_all;
 use std::fs::File;
 use std::io::prelude::*;
@@ -42,7 +41,7 @@ pub fn export_grid_to_file(grid: &Grid) {
             Err(error) => panic!("Storage folder cannot be created: {:?}", error),
             Ok(_) => {
                 let mut file = File::create("grids/save.json").unwrap();
-                file.write_all(serialized.as_bytes());
+                let _ = file.write_all(serialized.as_bytes());
                 println!("Grid export is compleated");
             }
         },

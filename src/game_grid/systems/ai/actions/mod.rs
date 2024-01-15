@@ -12,7 +12,6 @@ pub use pickup_axe::*;
 
 use super::find_path;
 use super::find_position_amid;
-use super::GridEntity;
 use super::GridEntityType;
 use super::Mutation;
 use super::MutationType;

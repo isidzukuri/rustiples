@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy::utils::hashbrown::Equivalent;
 use bevy::window::PrimaryWindow;
 
 mod components;
@@ -15,7 +14,7 @@ impl Plugin for GameGridPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(AppState::NewGame), start_game)
             .add_systems(OnEnter(AppState::LoadGame), start_game)
-            .add_systems(OnEnter(AppState::InGrid), (controls::spawn_control_buttons))
+            .add_systems(OnEnter(AppState::InGrid), controls::spawn_control_buttons)
             .add_systems(
                 Update,
                 (grid_click, controls::button_pressed_event_listener)
