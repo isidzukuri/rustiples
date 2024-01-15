@@ -34,6 +34,7 @@ pub fn start_game(
         load_grid(&mut commands, &window_query, &asset_server);
     } else {
         generate_grid(&mut commands, &window_query, &asset_server);
+
     }
     app_state.set(AppState::InGrid);
 }
