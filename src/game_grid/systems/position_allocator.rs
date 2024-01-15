@@ -17,18 +17,24 @@ pub struct PositionAllocator {
 }
 
 impl PositionAllocator {
-    pub fn allocate_coords(&mut self, coords: (u32, u32)) -> Option<PositionAllocation> {
+    pub fn allocate_coords(
+        &mut self,
+        coords: (u32, u32),
+        width: u32,
+        height: u32,
+    ) -> Option<PositionAllocation> {
         if self.reserved_cells.contains(&coords) {
             panic!("Position already reserved");
         }
+        // TODO: check in range of width/height positions are available
 
         self.reserved_cells.push(coords);
 
         Some(PositionAllocation {
             x1: coords.0,
             y1: coords.1,
-            x2: coords.0 + 1,
-            y2: coords.1 + 1,
+            x2: coords.0 + width,
+            y2: coords.1 + height,
         })
     }
 
