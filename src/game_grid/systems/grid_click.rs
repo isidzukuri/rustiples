@@ -90,7 +90,7 @@ fn render_route(
             (node.x == path_node.0 && node.y == path_node.1)
                 && (match grid.find_entity_type_by_node(&node) {
                     Some(entity_type) => {
-                        entity_type != GridEntityType::Hero && entity_type != GridEntityType::Axe
+                        entity_type != GridEntityType::Hero && entity_type != GridEntityType::Axe && entity_type != GridEntityType::Bridge
                     }
                     None => true,
                 })
