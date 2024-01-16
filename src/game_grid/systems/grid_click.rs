@@ -24,7 +24,10 @@ pub fn grid_click(
         (With<GridEntity>, Without<GridNode>),
     >,
     mut commands: Commands,
+    interaction_query: Query<&Interaction, Changed<Interaction>>,
 ) {
+    if !interaction_query.is_empty() {return;}
+    
     if mouse.just_pressed(MouseButton::Right) {
         if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {
             clear_prev_route_markings(&mut game_grid_nodes, &grid);
