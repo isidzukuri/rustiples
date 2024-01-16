@@ -26,8 +26,10 @@ pub fn grid_click(
     mut commands: Commands,
     interaction_query: Query<&Interaction, Changed<Interaction>>,
 ) {
-    if !interaction_query.is_empty() {return;}
-    
+    if !interaction_query.is_empty() {
+        return;
+    }
+
     if mouse.just_pressed(MouseButton::Right) {
         if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {
             clear_prev_route_markings(&mut game_grid_nodes, &grid);
@@ -90,7 +92,9 @@ fn render_route(
             (node.x == path_node.0 && node.y == path_node.1)
                 && (match grid.find_entity_type_by_node(&node) {
                     Some(entity_type) => {
-                        entity_type != GridEntityType::Hero && entity_type != GridEntityType::Axe && entity_type != GridEntityType::Bridge
+                        entity_type != GridEntityType::Hero
+                            && entity_type != GridEntityType::Axe
+                            && entity_type != GridEntityType::Bridge
                     }
                     None => true,
                 })
