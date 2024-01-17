@@ -13,6 +13,7 @@ impl Action for FindPath {
         if path.is_some() {
             state.destination_reached = true;
             if let Some(ref mut prev_path) = state.path {
+                prev_path.pop();
                 prev_path.append(&mut path.unwrap());
             } else {
                 state.path = path;

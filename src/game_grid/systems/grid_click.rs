@@ -1,10 +1,12 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-use super::grid_entities_utils::place_entity;
+use super::grid_entities_utils::*;
 use crate::game_grid::ai::pathfinding_params::PathfindingParams;
 use crate::game_grid::ai::*;
 use crate::game_grid::grid::GridEntityType;
+use crate::game_grid::grid_entity;
+use crate::game_grid::movement_action::MovementAction;
 use crate::game_grid::mutation::*;
 use crate::game_grid::systems::Grid;
 use crate::game_grid::systems::GridEntity;
@@ -56,13 +58,24 @@ pub fn grid_click(
                 }
                 Some(ref nodes) => {
                     render_route(&mut game_grid_nodes, &grid, &mut state);
-                    aply_mutations(
-                        &mut grid,
-                        &grid_entities,
+                    let grid_entity_id = grid
+                        .find_entry_by_coords(&hero_positions[0].0, &hero_positions[0].1)
+                        .unwrap()
+                        .entity_id
+                        .unwrap();
+                    // TODO: remove existing MovementAction for entity
+                    commands.spawn(MovementAction::new(
+                        grid_entity_id,
+                        state.path.unwrap(),
                         state.mutations,
-                        &mut commands,
-                        &asset_server,
-                    );
+                    ));
+                    // apply_mutations(
+                    //     &mut grid,
+                    //     &grid_entities,
+                    //     state.mutations,
+                    //     &mut commands,
+                    //     &asset_server,
+                    // );
                 }
             }
         }
@@ -110,43 +123,6 @@ fn render_route(
                 })
             }
         };
-    }
-}
-
-fn aply_mutations(
-    grid: &mut Grid,
-    grid_entities: &Query<
-        (Entity, &mut Sprite, &mut GridEntity),
-        (With<GridEntity>, Without<GridNode>),
-    >,
-    mutations: Vec<Mutation>,
-    commands: &mut Commands,
-    asset_server: &Res<AssetServer>,
-) {
-    for mutation in mutations {
-        if mutation.mutation_type == MutationType::Create {
-            place_entity(
-                grid,
-                commands,
-                asset_server,
-                mutation.entity_type.unwrap(),
-                mutation.coords,
-            );
-        }
-        if mutation.mutation_type == MutationType::Destroy {
-            let id = grid
-                .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
-                .unwrap()
-                .entity_id
-                .unwrap();
-            if let Some((entity, _sprite, grid_entity)) = grid_entities
-                .iter()
-                .find(|(_, _, grid_entity)| grid_entity.id == id)
-            {
-                grid.delete_entity(grid_entity.id);
-                commands.entity(entity).despawn();
-            }
-        }
     }
 }
 

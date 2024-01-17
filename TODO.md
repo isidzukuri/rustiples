@@ -3,5 +3,9 @@
 - add animated sprites
 - castle screen: enter castle, screen building
 - combine maze and castle in grid generation
-
+- add oponents
+- add animations
+- fix spawn_button to not overlay one button on top of another
+- make world bigger than window, add scroll
+- fog of war and discover action for ai
 	

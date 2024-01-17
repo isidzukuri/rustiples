@@ -38,20 +38,30 @@ impl PositionAllocator {
         })
     }
 
-    pub fn allocate(&mut self, width: u32, height: u32) -> Option<PositionAllocation> {
+    pub fn allocate(
+        &mut self,
+        width: u32,
+        height: u32,
+        margin: (u32, u32, u32, u32),
+    ) -> Option<PositionAllocation> {
         let mut col_index: u32 = 0;
         let mut row_index: u32 = 0;
         let mut variants = vec![];
+
+        let width_with_box = width + margin.1 + margin.3;
+        let height_with_box = height + margin.0 + margin.2;
 
         loop {
             if row_index == self.height && col_index == 0 {
                 break;
             }
-            if (col_index + width) < self.width && (row_index + height) < self.height {
+            if (col_index + width_with_box) < self.width
+                && (row_index + height_with_box) < self.height
+            {
                 let mut allocated = true;
 
-                for cur_col_index in col_index..(col_index + width) {
-                    for cur_row_index in row_index..(row_index + height) {
+                for cur_col_index in col_index..(col_index + width_with_box) {
+                    for cur_row_index in row_index..(row_index + height_with_box) {
                         if self
                             .reserved_cells
                             .contains(&(cur_col_index, cur_row_index))
@@ -67,10 +77,10 @@ impl PositionAllocator {
 
                 if allocated {
                     variants.push(PositionAllocation {
-                        x1: col_index,
-                        y1: row_index,
-                        x2: col_index + width,
-                        y2: row_index + height,
+                        x1: col_index + margin.3,
+                        y1: row_index + margin.2,
+                        x2: col_index + width + margin.3,
+                        y2: row_index + height + margin.2,
                     });
                 }
             }

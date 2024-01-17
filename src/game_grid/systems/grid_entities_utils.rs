@@ -3,6 +3,8 @@ use bevy::window::PrimaryWindow;
 
 use crate::game_grid::grid::*;
 use crate::game_grid::grid_entity_factory::GridEntityFactory;
+use crate::game_grid::mutation::*;
+use crate::game_grid::systems::*;
 
 use super::GRID_NODE_SIZE;
 
@@ -13,12 +15,18 @@ pub fn grid_new(window_query: &Query<&Window, With<PrimaryWindow>>) -> (Grid, Ve
     Grid::new(width, height, GRID_NODE_SIZE)
 }
 
-pub fn spawn_grid_nodes_sprites(grid: &Grid, nodes: Vec<GridNode>, commands: &mut Commands) {
+pub fn node_center_window_coords(coords: &(u32, u32)) -> (f32, f32) {
     let half_size = GRID_NODE_SIZE / 2.0;
+    (
+        GRID_NODE_SIZE * coords.0 as f32 + half_size,
+        GRID_NODE_SIZE * coords.1 as f32 + half_size,
+    )
+}
+
+pub fn spawn_grid_nodes_sprites(grid: &Grid, nodes: Vec<GridNode>, commands: &mut Commands) {
     for node in nodes {
         let coords = grid.find_coords_by_node_id(&node.id);
-        let window_x = GRID_NODE_SIZE * coords.0 as f32 + half_size;
-        let window_y = GRID_NODE_SIZE * coords.1 as f32 + half_size;
+        let (window_x, window_y) = node_center_window_coords(&coords);
 
         commands.spawn((
             SpriteBundle {
@@ -75,4 +83,41 @@ pub fn spawn_sprite_bundle(
         },
         grid_entity,
     ));
+}
+
+pub fn apply_mutations(
+    grid: &mut Grid,
+    grid_entities: &Query<
+        (Entity, &mut Sprite, &mut GridEntity),
+        (With<GridEntity>, Without<GridNode>),
+    >,
+    mutations: Vec<Mutation>,
+    commands: &mut Commands,
+    asset_server: &Res<AssetServer>,
+) {
+    for mutation in mutations {
+        if mutation.mutation_type == MutationType::Create {
+            place_entity(
+                grid,
+                commands,
+                asset_server,
+                mutation.entity_type.unwrap(),
+                mutation.coords,
+            );
+        }
+        if mutation.mutation_type == MutationType::Destroy {
+            let id = grid
+                .find_entry_by_coords(&mutation.coords.0, &mutation.coords.1)
+                .unwrap()
+                .entity_id
+                .unwrap();
+            if let Some((entity, _sprite, grid_entity)) = grid_entities
+                .iter()
+                .find(|(_, _, grid_entity)| grid_entity.id == id)
+            {
+                grid.delete_entity(grid_entity.id);
+                commands.entity(entity).despawn();
+            }
+        }
+    }
 }
