@@ -69,13 +69,6 @@ pub fn grid_click(
                         state.path.unwrap(),
                         state.mutations,
                     ));
-                    // apply_mutations(
-                    //     &mut grid,
-                    //     &grid_entities,
-                    //     state.mutations,
-                    //     &mut commands,
-                    //     &asset_server,
-                    // );
                 }
             }
         }
