@@ -3,7 +3,7 @@ use super::*;
 pub struct BuildBridge {}
 
 impl Action for BuildBridge {
-    fn is_available(&self, params: &PathfindingParams) -> bool {
+    fn is_available(&self, _params: &PathfindingParams) -> bool {
         true
         // if has lumber mill
     }

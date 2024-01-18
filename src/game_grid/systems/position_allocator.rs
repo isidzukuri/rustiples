@@ -164,8 +164,8 @@ mod tests {
         let width = 0u32;
         let height = 0u32;
 
-        let allocation = position_allocator.allocate_coords(coords, width, height);
-        let allocation = position_allocator.allocate_coords(coords, width, height);
+        let _allocation = position_allocator.allocate_coords(coords, width, height);
+        let _allocation = position_allocator.allocate_coords(coords, width, height);
     }
 
     #[test]

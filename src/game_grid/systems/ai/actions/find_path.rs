@@ -3,7 +3,7 @@ use super::*;
 pub struct FindPath {}
 
 impl Action for FindPath {
-    fn is_available(&self, params: &PathfindingParams) -> bool {
+    fn is_available(&self, _params: &PathfindingParams) -> bool {
         true
     }
 

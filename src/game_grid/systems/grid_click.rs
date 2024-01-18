@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-use super::grid_entities_utils::*;
+
 use crate::game_grid::ai::pathfinding_params::PathfindingParams;
 use crate::game_grid::ai::*;
 use crate::game_grid::grid::GridEntityType;
-use crate::game_grid::grid_entity;
+
 use crate::game_grid::movement_action::MovementAction;
 use crate::game_grid::mutation::*;
 use crate::game_grid::systems::Grid;
@@ -18,10 +18,10 @@ pub fn grid_click(
     mouse: Res<Input<MouseButton>>,
     windows: Query<&Window, With<PrimaryWindow>>,
     camera: Query<(&Camera, &GlobalTransform), With<Camera>>,
-    asset_server: Res<AssetServer>,
-    mut grid: ResMut<Grid>,
+    _asset_server: Res<AssetServer>,
+    grid: ResMut<Grid>,
     mut game_grid_nodes: Query<(&mut Sprite, &mut GridNode), With<GridNode>>,
-    mut grid_entities: Query<
+    _grid_entities: Query<
         (Entity, &mut Sprite, &mut GridEntity),
         (With<GridEntity>, Without<GridNode>),
     >,
@@ -38,9 +38,9 @@ pub fn grid_click(
 
             let hero_positions = grid.find_coords_by_type(GridEntityType::Hero);
 
-            let mut travels_thru = vec![GridEntityType::Axe, GridEntityType::Bridge];
+            let travels_thru = vec![GridEntityType::Axe, GridEntityType::Bridge];
 
-            let mut pathfinding_params = PathfindingParams {
+            let pathfinding_params = PathfindingParams {
                 start_node: hero_positions[0],
                 end_node: (col_index, row_index),
                 graph_node_types: travels_thru,
@@ -56,7 +56,7 @@ pub fn grid_click(
                     println!("There is no way")
                     // print_world_info(commands, "There is no path!!!".to_string())
                 }
-                Some(ref nodes) => {
+                Some(ref _nodes) => {
                     render_route(&mut game_grid_nodes, &grid, &mut state);
                     let grid_entity_id = grid
                         .find_entry_by_coords(&hero_positions[0].0, &hero_positions[0].1)
@@ -73,7 +73,7 @@ pub fn grid_click(
             }
         }
     } else if mouse.just_pressed(MouseButton::Left) {
-        if let Some((col_index, row_index)) = detect_graph_node_click(windows, camera) {}
+        if let Some((_col_index, _row_index)) = detect_graph_node_click(windows, camera) {}
     }
 }
 
@@ -94,7 +94,7 @@ fn render_route(
     state: &mut state::State,
 ) {
     for path_node in state.path.as_ref().unwrap().iter() {
-        if let Some((mut sprite, mut node)) = game_grid_nodes.iter_mut().find(|(_, ref node)| {
+        if let Some((mut sprite, node)) = game_grid_nodes.iter_mut().find(|(_, ref node)| {
             (node.x == path_node.0 && node.y == path_node.1)
                 && (match grid.find_entity_type_by_node(&node) {
                     Some(entity_type) => {

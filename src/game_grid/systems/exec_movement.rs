@@ -6,7 +6,7 @@ use crate::game_grid::systems::GridEntity;
 use crate::game_grid::systems::GridEntityType;
 use crate::game_grid::systems::GridNode;
 
-use bevy::ecs::entity;
+
 use bevy::prelude::*;
 
 pub fn exec_movement(
@@ -30,7 +30,7 @@ pub fn exec_movement(
                 if next_grid_node_entry.entity_type == Some(GridEntityType::Tree) {
                     let entity_id_for_mutation = next_grid_node_entry.entity_id.unwrap();
 
-                    if let Some((entity, _, _, mut transform)) = grid_entities
+                    if let Some((entity, _, _, _transform)) = grid_entities
                         .iter_mut()
                         .find(|(_, _, grid_entity, _)| grid_entity.id == entity_id_for_mutation)
                     {
@@ -50,7 +50,7 @@ pub fn exec_movement(
                             .unwrap()
                             .entity_id
                         {
-                            if let Some((entity, _, _, mut transform)) =
+                            if let Some((entity, _, _, _transform)) =
                                 grid_entities.iter_mut().find(|(_, _, grid_entity, _)| {
                                     grid_entity.id == entity_id_for_mutation
                                 })
@@ -71,7 +71,7 @@ pub fn exec_movement(
                     }
                 }
 
-                let (entity, sprite, mut grid_entity, mut transform) = grid_entities
+                let (_entity, _sprite, mut grid_entity, mut transform) = grid_entities
                     .iter_mut()
                     .find(|(_, _, grid_entity, _)| grid_entity.id == movement.grid_entity_id)
                     .unwrap();

@@ -3,8 +3,8 @@ use bevy::window::PrimaryWindow;
 
 use crate::game_grid::grid::*;
 use crate::game_grid::grid_entity_factory::GridEntityFactory;
-use crate::game_grid::mutation::*;
-use crate::game_grid::systems::*;
+
+
 
 use super::GRID_NODE_SIZE;
 
@@ -70,7 +70,7 @@ pub fn place_entity(
 }
 
 pub fn spawn_sprite_bundle(
-    mut commands: &mut Commands,
+    commands: &mut Commands,
     asset_server: &Res<AssetServer>,
     grid_entity: GridEntity,
 ) {

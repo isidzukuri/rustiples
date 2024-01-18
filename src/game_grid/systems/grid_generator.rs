@@ -21,7 +21,7 @@ pub fn generate_grid(
 
 pub fn place_entities_randomly(
     grid: &mut Grid,
-    mut commands: &mut Commands,
+    commands: &mut Commands,
     asset_server: &Res<AssetServer>,
 ) {
     let objcts_to_create = vec![
@@ -41,7 +41,7 @@ pub fn place_entities_randomly(
 
 pub fn place_entities_precisely(
     grid: &mut Grid,
-    mut commands: &mut Commands,
+    commands: &mut Commands,
     asset_server: &Res<AssetServer>,
 ) {
     let objcts_to_create = vec![
