@@ -37,7 +37,7 @@ mod tests {
     fn test_create_failure() {
         let (mut grid, _) = Grid::new(10, 10, 50.);
 
-        let obj = GridEntityFactory::create(&mut grid, GridEntityType::Castle, None);
-        let obj = GridEntityFactory::create(&mut grid, GridEntityType::Castle, None);
+        GridEntityFactory::create(&mut grid, GridEntityType::Castle, None);
+        GridEntityFactory::create(&mut grid, GridEntityType::Castle, None);
     }
 }
