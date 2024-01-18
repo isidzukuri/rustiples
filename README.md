@@ -11,3 +11,6 @@ At the momment game knows how to:
 - where on the map is better to put some specific object (for example: lumber mill should be constructed amid highest density of trees)
 - destruct object on map
 - export/import map
+
+
+### Testing
