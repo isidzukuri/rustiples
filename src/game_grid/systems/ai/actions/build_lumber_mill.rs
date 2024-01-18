@@ -19,6 +19,7 @@ impl Action for BuildLumberMill {
             params.start_node = lumber_position;
 
             if let Some(ref mut path) = state.path {
+                path.pop();
                 path.append(&mut path_to_point.unwrap());
             } else {
                 state.path = path_to_point;

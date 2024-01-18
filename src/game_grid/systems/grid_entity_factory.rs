@@ -11,66 +11,33 @@ impl GridEntityFactory {
         obj_type: GridEntityType,
         at_coords: Option<(u32, u32)>,
     ) -> GridEntity {
-        let config = match obj_type {
-            GridEntityType::Castle => GridEntityConfig {
-                sprite: "sprites/castle.png".to_string(),
-                width_px: 350.0,
-                height_px: 250.0,
-                margin: (1, 1, 1, 1),
-                entity_type: obj_type,
-            },
-            GridEntityType::Hero => GridEntityConfig {
-                sprite: "sprites/hero.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::Axe => GridEntityConfig {
-                sprite: "sprites/axe.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::Tree => GridEntityConfig {
-                sprite: "sprites/tree.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::Mountain => GridEntityConfig {
-                sprite: "sprites/mountain_50.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::Water => GridEntityConfig {
-                sprite: "sprites/water_50.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::LumberMill => GridEntityConfig {
-                sprite: "sprites/lumber_mill_50.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            GridEntityType::Bridge => GridEntityConfig {
-                sprite: "sprites/bridge_50.png".to_string(),
-                width_px: 50.0,
-                height_px: 50.0,
-                margin: (0, 0, 0, 0),
-                entity_type: obj_type,
-            },
-            _ => panic!("Not registered GridEntityType"),
-        };
+        let config = GridEntityConfig::resolve_config(obj_type);
 
         grid.create_entity(&config, at_coords)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create() {
+        let (mut grid, _) = Grid::new(10, 10, 50.);
+
+        let obj = GridEntityFactory::create(&mut grid, GridEntityType::Tree, Some((0u32, 0u32)));
+        assert_eq!(obj.entity_type, GridEntityType::Tree);
+
+        let obj = GridEntityFactory::create(&mut grid, GridEntityType::Axe, None);
+        assert_eq!(obj.entity_type, GridEntityType::Axe);
+    }
+
+    #[test]
+    #[should_panic(expected = "not possible to allocate space in world for the object")]
+    fn test_create_failure() {
+        let (mut grid, _) = Grid::new(10, 10, 50.);
+
+        GridEntityFactory::create(&mut grid, GridEntityType::Castle, None);
+        GridEntityFactory::create(&mut grid, GridEntityType::Castle, None);
     }
 }

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use super::{WorldInfoItem, WorldInfoRoot, WorldInfoText};
 
-pub fn print_window_size(mut commands: Commands, windows: Query<&Window>) {
+pub fn print_window_size(commands: Commands, windows: Query<&Window>) {
     let window = windows.single();
 
     print_world_info(commands, format!("{}x{}", window.width(), window.height()));

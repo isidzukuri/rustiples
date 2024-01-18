@@ -13,12 +13,18 @@ pub fn grid_new(window_query: &Query<&Window, With<PrimaryWindow>>) -> (Grid, Ve
     Grid::new(width, height, GRID_NODE_SIZE)
 }
 
-pub fn spawn_grid_nodes_sprites(grid: &Grid, nodes: Vec<GridNode>, commands: &mut Commands) {
+pub fn node_center_window_coords(coords: &(u32, u32)) -> (f32, f32) {
     let half_size = GRID_NODE_SIZE / 2.0;
+    (
+        GRID_NODE_SIZE * coords.0 as f32 + half_size,
+        GRID_NODE_SIZE * coords.1 as f32 + half_size,
+    )
+}
+
+pub fn spawn_grid_nodes_sprites(grid: &Grid, nodes: Vec<GridNode>, commands: &mut Commands) {
     for node in nodes {
         let coords = grid.find_coords_by_node_id(&node.id);
-        let window_x = GRID_NODE_SIZE * coords.0 as f32 + half_size;
-        let window_y = GRID_NODE_SIZE * coords.1 as f32 + half_size;
+        let (window_x, window_y) = node_center_window_coords(&coords);
 
         commands.spawn((
             SpriteBundle {
@@ -62,7 +68,7 @@ pub fn place_entity(
 }
 
 pub fn spawn_sprite_bundle(
-    mut commands: &mut Commands,
+    commands: &mut Commands,
     asset_server: &Res<AssetServer>,
     grid_entity: GridEntity,
 ) {

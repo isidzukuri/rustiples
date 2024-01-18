@@ -1,6 +1,6 @@
 # Rustiples
 
-The game. Learn rust by developing game with Bevy engine. Remember: its just a playground, not release ready product. Don't be too serious. Experiment more.
+The game. Learn rust by developing game with Bevy engine. Remember: its just a playground. Don't be too serious. Experiment more. ...code would become better later ...maybe
 
 
 ### Features
@@ -11,3 +11,6 @@ At the momment game knows how to:
 - where on the map is better to put some specific object (for example: lumber mill should be constructed amid highest density of trees)
 - destruct object on map
 - export/import map
+
+
+### Testing

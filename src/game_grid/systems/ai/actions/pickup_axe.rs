@@ -24,6 +24,7 @@ impl Action for PickupAxe {
             params.start_node = axe_position;
 
             if let Some(ref mut path) = state.path {
+                path.pop();
                 path.append(&mut path_to_axe.unwrap());
             } else {
                 state.path = path_to_axe;
@@ -33,7 +34,7 @@ impl Action for PickupAxe {
             //     entity_id: None,
             //     mutation_type: MutationType::Destroy,
             //     coords: axe_position,
-            //     entity_type: None
+            //     entity_type: None,
             // });
             state.actions.push_front(Box::new(BuildLumberMill {}));
             state.actions.push_front(Box::new(FindPath {}));

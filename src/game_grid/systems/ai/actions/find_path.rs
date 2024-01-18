@@ -3,7 +3,7 @@ use super::*;
 pub struct FindPath {}
 
 impl Action for FindPath {
-    fn is_available(&self, params: &PathfindingParams) -> bool {
+    fn is_available(&self, _params: &PathfindingParams) -> bool {
         true
     }
 
@@ -13,6 +13,7 @@ impl Action for FindPath {
         if path.is_some() {
             state.destination_reached = true;
             if let Some(ref mut prev_path) = state.path {
+                prev_path.pop();
                 prev_path.append(&mut path.unwrap());
             } else {
                 state.path = path;

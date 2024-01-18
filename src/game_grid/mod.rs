@@ -19,7 +19,12 @@ impl Plugin for GameGridPlugin {
                 Update,
                 (grid_click, controls::button_pressed_event_listener)
                     .run_if(in_state(AppState::InGrid)),
-            );
+            )
+            .add_systems(
+                FixedUpdate,
+                exec_movement.run_if(in_state(AppState::InGrid)),
+            )
+            .insert_resource(Time::<Fixed>::from_seconds(0.1));
     }
 }
 
