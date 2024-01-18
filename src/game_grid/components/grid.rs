@@ -10,8 +10,6 @@ pub use crate::game_grid::grid_node::*;
 pub use crate::game_grid::grid_position::*;
 use crate::game_grid::systems::position_allocator::PositionAllocator;
 
-
-
 #[derive(Resource, Serialize, Deserialize)]
 pub struct Grid {
     index: Vec<Entry>,

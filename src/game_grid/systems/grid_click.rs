@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-
 use crate::game_grid::ai::pathfinding_params::PathfindingParams;
 use crate::game_grid::ai::*;
 use crate::game_grid::grid::GridEntityType;

@@ -4,8 +4,6 @@ use bevy::window::PrimaryWindow;
 use crate::game_grid::grid::*;
 use crate::game_grid::grid_entity_factory::GridEntityFactory;
 
-
-
 use super::GRID_NODE_SIZE;
 
 pub fn grid_new(window_query: &Query<&Window, With<PrimaryWindow>>) -> (Grid, Vec<GridNode>) {

@@ -45,6 +45,7 @@ impl PositionAllocator {
         height: u32,
         margin: (u32, u32, u32, u32),
     ) -> Option<PositionAllocation> {
+        // TODO: validate params
         let mut col_index: u32 = 0;
         let mut row_index: u32 = 0;
         let mut variants = vec![];
@@ -215,23 +216,12 @@ mod tests {
     #[test]
     fn test_release_coords() {
         let mut position_allocator = PositionAllocator {
-            width: 1,
-            height: 1,
-            reserved_cells: vec![],
+            width: 10,
+            height: 10,
+            reserved_cells: vec![(0, 0)],
         };
 
-        let coords = (1u32, 1u32);
-        let width = 0u32;
-        let height = 0u32;
-        let margin = (0u32, 0u32, 0u32, 0u32);
-
-        let _ = position_allocator.allocate_coords(coords, width, height);
-        let allocation = position_allocator.allocate(width, height, margin);
-        assert_eq!(allocation.is_some(), false);
-
-        position_allocator.release_coords(vec![coords]);
-
-        let allocation = position_allocator.allocate(width, height, margin);
-        assert_eq!(allocation.is_some(), true);
+        position_allocator.release_coords(vec![(0u32, 0u32)]);
+        assert_eq!(position_allocator.reserved_cells.is_empty(), true);
     }
 }

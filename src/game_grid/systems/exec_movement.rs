@@ -6,7 +6,6 @@ use crate::game_grid::systems::GridEntity;
 use crate::game_grid::systems::GridEntityType;
 use crate::game_grid::systems::GridNode;
 
-
 use bevy::prelude::*;
 
 pub fn exec_movement(
