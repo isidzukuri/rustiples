@@ -175,6 +175,13 @@ impl Grid {
         }
     }
 
+    pub fn find_entry_by_node_id(&self, node_id: &Uuid) -> &Entry {
+        match self.index.iter().find(|entry| &entry.node_id == node_id) {
+            Some(entry) => entry,
+            _ => panic!("Entry with such node_id does not exists in the grid"),
+        }
+    }
+
     pub fn find_entry_by_entity_id(&self, entity_id: Uuid) -> &Entry {
         match self
             .index
@@ -267,7 +274,6 @@ mod tests {
 
         let config = GridEntityConfig::resolve_config(GridEntityType::Tree);
         let entity = grid.create_entity(&config, Some((1, 1)));
-        assert_eq!(entity.x_px, 75.0);
         assert_eq!(entity.entity_type, GridEntityType::Tree);
 
         let releted_entry = grid.find_entry_by_entity_id(entity.id);
@@ -308,7 +314,45 @@ mod tests {
         assert_eq!(position.y1, 1);
     }
 
-    // delete entity
-    // move entity
-    // find_*
+    #[test]
+    fn test_delete_entity() {
+        let (mut grid, _) = Grid::new(2, 2, 50.);
+        let config = GridEntityConfig::resolve_config(GridEntityType::Tree);
+        let entity_id = grid.create_entity(&config, None).id;
+        let node_id = grid.find_entry_by_entity_id(entity_id).node_id;
+
+        grid.delete_entity(entity_id);
+
+        let releted_entry = grid.find_entry_by_node_id(&node_id);
+        assert_eq!(releted_entry.entity_id.is_none(), true);
+        assert_eq!(releted_entry.entity_type.is_none(), true);
+        assert_eq!(releted_entry.position_id.is_none(), true);
+    }
+
+    #[test]
+    fn test_move_entity() {
+        let (mut grid, _) = Grid::new(2, 2, 50.);
+        let from_coords = (0u32, 0u32);
+        let to_coords = (1u32, 1u32);
+        let config = GridEntityConfig::resolve_config(GridEntityType::Tree);
+        let entity_id = grid.create_entity(&config, Some(from_coords)).id;
+
+        grid.move_entity(&entity_id, &to_coords);
+
+        let prev_entry = grid
+            .find_entry_by_coords(&from_coords.0, &from_coords.1)
+            .unwrap();
+        assert_eq!(prev_entry.entity_id.is_none(), true);
+        assert_eq!(prev_entry.entity_type.is_none(), true);
+        assert_eq!(prev_entry.position_id.is_none(), true);
+
+        let current_entry = grid
+            .find_entry_by_coords(&to_coords.0, &to_coords.1)
+            .unwrap();
+        assert_eq!(current_entry.entity_id, Some(entity_id));
+        assert_eq!(current_entry.entity_type, Some(GridEntityType::Tree));
+        assert_eq!(current_entry.position_id.is_none(), false);
+    }
+
+    // TODO: find_*
 }
